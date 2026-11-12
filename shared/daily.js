@@ -5,7 +5,7 @@
   // While true, every game shows its test panel and keeps its saves and stats
   // separate from real play. Set to false before launch.
   // A URL can override it either way: ?test=1 or ?test=0
-  const TEST_MODE = true;
+  const TEST_MODE = false;
   const testParam = new URLSearchParams(location.search).get("test");
   const TEST = testParam === null ? TEST_MODE : testParam !== "0";
 
