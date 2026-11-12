@@ -15,7 +15,7 @@
   <meta name="theme-color" content="#0d1730">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%230d1730%22/><text x=%2250%22 y=%2270%22 font-size=%2260%22 text-anchor=%22middle%22 fill=%22%23e3b448%22 font-family=%22Georgia%22>D</text></svg>">
   <link rel="stylesheet" href="../shared/style.css">
-  <link rel="stylesheet" href="haikudle.css?v=3">
+  <link rel="stylesheet" href="haikudle.css?v=5">
 </head>
 <body>
   <header class="topbar">
@@ -29,6 +29,7 @@
     <h1 class="title">Haikudle <small id="dayLabel"></small></h1>
 
     <div class="status" id="status">Loading today's words…</div>
+    <div class="captcha" id="captcha"></div>
 
     <details class="best board" id="best" hidden open>
       <summary>Yesterday's best <small id="bestDay"></small></summary>
@@ -119,11 +120,12 @@
 
   <div class="toast" id="toast"></div>
 
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="../shared/daily.js"></script>
   <script src="../shared/games.js"></script>
   <script src="../shared/analytics.js"></script>
-  <script src="config.js?v=3"></script>
-  <script src="haikudle.js?v=3"></script>
+  <script src="config.js?v=5"></script>
+  <script src="haikudle.js?v=5"></script>
 </body>
 </html>

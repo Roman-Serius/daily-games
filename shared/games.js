@@ -8,6 +8,11 @@ window.GAMES = [
     suggest: "A word that should (or shouldn't) be an answer, a word that was wrongly rejected, a bug, an idea…",
   },
   {
+    id: "haikudle", name: "Haikudle", glyph: "5·7·5", status: "live",
+    blurb: "Eighteen word magnets, one haiku. Post yours, then like everyone else's.",
+    suggest: "A word you'd love to see in the draw, a bug, an idea…",
+  },
+  {
     id: "trolley", name: "The Daily Trolley", glyph: "─┬─", status: "soon",
     blurb: "One dilemma a day. Choose, then see how everyone else chose.",
     suggest: "Describe your dilemma and the two or three options people would choose between…",

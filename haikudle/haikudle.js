@@ -70,6 +70,7 @@
     if (/anonymous sign-ins are disabled/i.test(m)) return "Setup needed: turn on anonymous sign-ins in Supabase (Authentication → Sign In / Providers).";
     if (/schema must be one of|Invalid schema/i.test(m)) return "Setup needed: add \"haikudle\" to Exposed schemas in Supabase (Project Settings → Data API).";
     if (/Could not find the function|does not exist/i.test(m)) return "Setup needed: run supabase/schema.sql in the Supabase SQL Editor.";
+    if (/captcha/i.test(m)) return "The human check didn't go through. Refresh the page to try again.";
     if (/Failed to fetch|NetworkError|Load failed/i.test(m)) return "Couldn't reach the haiku server. Check your connection and refresh.";
     return m;
   }
@@ -79,13 +80,41 @@
     try {
       const { data: { session } } = await sb.auth.getSession();
       if (!session) {
-        const { error } = await sb.auth.signInAnonymously();
+        // New player: a quick (usually invisible) Turnstile check, then an anonymous account.
+        const captchaToken = await captcha();
+        const { error } = await sb.auth.signInAnonymously(captchaToken ? { options: { captchaToken } } : undefined);
         if (error) throw error;
       }
       await loadToday();
     } catch (e) {
       fatal(friendly(e));
     }
+  }
+
+  // Cloudflare Turnstile. Only shows anything if Cloudflare wants the player to click.
+  function captcha() {
+    if (!cfg.turnstile) return Promise.resolve(null);
+    return new Promise((resolve, reject) => {
+      const started = Date.now();
+      let errors = 0;
+      const ready = () => {
+        if (!window.turnstile) {
+          if (Date.now() - started > 15000) return reject(new Error("Couldn't load the human check. Refresh to try again."));
+          return setTimeout(ready, 100);
+        }
+        window.turnstile.render($("captcha"), {
+          sitekey: cfg.turnstile,
+          appearance: "interaction-only",
+          callback: (token) => { $("captcha").replaceChildren(); resolve(token); },
+          // Cloudflare retries on its own after a hiccup; only give up after a few failures.
+          "error-callback": () => {
+            errors++;
+            if (errors >= 3) reject(new Error("The human check failed. Refresh to try again."));
+          },
+        });
+      };
+      ready();
+    });
   }
 
   async function loadToday() {
@@ -322,6 +351,7 @@
 
   // ---------- after posting ----------
   function showPosted() {
+    Daily.saveDay("haikudle", { status: "posted" });   // lets the hub show "played today"
     $("compose").hidden = true;
     $("mine").hidden = false;
     $("feedWrap").hidden = false;

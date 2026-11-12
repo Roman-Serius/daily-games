@@ -5,4 +5,7 @@
 window.HAIKUDLE_CONFIG = {
   url: "https://tmitjoctttzeikxpyljg.supabase.co",
   key: "sb_publishable_UsL9Zcjtbdenk6vzHrQs7Q_Psgq1rRi",
+  // Cloudflare Turnstile site key (public). The matching secret key lives only in
+  // Supabase → Authentication → Attack Protection. Leave empty to skip the CAPTCHA.
+  turnstile: "0x4AAAAAAF-nt_e42HwaP1u7",
 };
