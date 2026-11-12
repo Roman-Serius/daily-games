@@ -3,8 +3,48 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <title>Caesarle · a daily cipher word game</title>
-  <meta name="description" content="Today's word is hidden behind a Caesar cipher. Probe it, crack the shift, then lock in your answer.">
+  <title>Caesarle: the daily Caesar cipher word game</title>
+  <meta name="description" content="Caesarle is a free daily word puzzle where the answer is hidden behind a Caesar cipher. Probe the encrypted word, crack the shift, and lock in your answer. New cipher every day.">
+  <link rel="canonical" href="https://roman-serius.github.io/daily-games/caesarle/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Daily Games by Roman Serius">
+  <meta property="og:title" content="Caesarle: the daily Caesar cipher word game">
+  <meta property="og:description" content="Caesarle is a free daily word puzzle where the answer is hidden behind a Caesar cipher. Probe the encrypted word, crack the shift, and lock in your answer. New cipher every day.">
+  <meta property="og:url" content="https://roman-serius.github.io/daily-games/caesarle/">
+  <meta property="og:image" content="https://roman-serius.github.io/daily-games/caesarle/og.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="theme-color" content="#0d1730">
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Caesarle",
+  "url": "https://roman-serius.github.io/daily-games/caesarle/",
+  "description": "Caesarle is a free daily word puzzle where the answer is hidden behind a Caesar cipher. Probe the encrypted word, crack the shift, and lock in your answer. New cipher every day.",
+  "applicationCategory": "GameApplication",
+  "genre": [
+    "Word game",
+    "Puzzle",
+    "Cipher"
+  ],
+  "operatingSystem": "Any (web browser)",
+  "isAccessibleForFree": true,
+  "inLanguage": "en",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  },
+  "author": {
+    "@type": "Person",
+    "name": "Roman Serius",
+    "url": "https://roman-serius.github.io/"
+  }
+}
+  </script>
+
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%230d1730%22/><text x=%2250%22 y=%2270%22 font-size=%2260%22 text-anchor=%22middle%22 fill=%22%23e3b448%22 font-family=%22Georgia%22>D</text></svg>">
   <link rel="stylesheet" href="../shared/style.css">
   <link rel="stylesheet" href="caesarle.css">
@@ -109,9 +149,21 @@
     </div>
   </div>
 
+  <footer class="about">
+    <h2>About Caesarle</h2>
+    <p>Caesarle is a free daily word game, like Wordle with a cipher twist. Each day's
+      five-letter word is encrypted with a Caesar cipher, the code Julius Caesar used,
+      where every letter shifts the same number of places along the alphabet. Probe the
+      hidden word with real words or with words written in the cipher, use the arrows to
+      find the shift, then lock in your answer. A new puzzle unlocks every day at midnight.</p>
+    <p><a href="../">More daily games</a> · <a href="../contact/?game=caesarle">Suggest a word</a> · Made by <a href="https://roman-serius.github.io/">Roman Serius</a></p>
+  </footer>
+
   <div class="toast" id="toast"></div>
 
   <script src="../shared/daily.js"></script>
+  <script src="../shared/games.js"></script>
+  <script src="../shared/analytics.js"></script>
   <script src="../shared/wheel.js"></script>
   <script src="words.js"></script>
   <script src="caesarle.js"></script>

@@ -4,7 +4,19 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Contact · Daily Games</title>
-  <meta name="description" content="Suggest a word, a dilemma, or report a problem.">
+  <meta name="description" content="Suggest a word for Caesarle, pitch a dilemma for the Daily Trolley, or report a problem.">
+  <link rel="canonical" href="https://roman-serius.github.io/daily-games/contact/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Daily Games by Roman Serius">
+  <meta property="og:title" content="Contact · Daily Games">
+  <meta property="og:description" content="Suggest a word, pitch a dilemma, or report a problem.">
+  <meta property="og:url" content="https://roman-serius.github.io/daily-games/contact/">
+  <meta property="og:image" content="https://roman-serius.github.io/daily-games/og.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="theme-color" content="#0d1730">
+
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%230d1730%22/><text x=%2250%22 y=%2270%22 font-size=%2260%22 text-anchor=%22middle%22 fill=%22%23e3b448%22 font-family=%22Georgia%22>D</text></svg>">
   <link rel="stylesheet" href="../shared/style.css">
   <style>
@@ -80,6 +92,7 @@
 
   <script src="../shared/daily.js"></script>
   <script src="../shared/games.js"></script>
+  <script src="../shared/analytics.js"></script>
   <script>
     (function () {
       const $ = (id) => document.getElementById(id);
@@ -163,7 +176,7 @@
         if (KEY) jobs.push(sendEmail(payload));
         const results = await Promise.allSettled(jobs);
         $("send").disabled = false;
-        if (results.some((r) => r.status === "fulfilled")) showDone("");
+        if (results.some((r) => r.status === "fulfilled")) { showDone(""); if (window.track) track("contact/sent", "Contact form sent"); }
         else setStatus((results[0] && results[0].reason && results[0].reason.message) || "Something went wrong. Please try again.", true);
       });
 

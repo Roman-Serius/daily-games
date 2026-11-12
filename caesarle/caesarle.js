@@ -1,5 +1,6 @@
 (function () {
   const GAME = "caesarle";
+  const track = window.track || (() => {});
   const ROWS = 6;
   const LEN = 5;
   const REJECT_COST = 5; // points lost per rejected probe
@@ -269,6 +270,7 @@
     const p = { word: current, shift: shiftStr ? parseInt(shiftStr, 10) : null, kind };
     const r = state.probes.length;
     state.probes.push(p);
+    if (state.probes.length === 1 && source !== "custom") track("caesarle/started", "Caesarle: started a game");
     Daily.saveDay(STORE, state, day);
     busy = true;
     paintProbe(r, p, true);
@@ -297,6 +299,7 @@
     closeModals();
     state.final = finalStr;
     state.status = finalStr === answer ? "won" : "lost";
+    if (source !== "custom") track(`caesarle/${state.status}`, `Caesarle: ${state.status}`);
     Daily.saveDay(STORE, state, day);
 
     const before = Daily.stats(STORE).lastDay;
@@ -400,6 +403,7 @@
         <div class="next"><a href="../contact/?game=caesarle">Suggest a word or report a problem</a></div>`;
       $("shareBtn").addEventListener("click", async () => {
         const r = await Daily.share(shareText());
+        track("caesarle/shared", "Caesarle: shared a result");
         toast(r === "copied" ? "Copied to clipboard" : r === "shared" ? "Shared" : "Couldn't copy");
       });
       clearInterval(timer);

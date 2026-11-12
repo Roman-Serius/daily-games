@@ -28,4 +28,12 @@ window.SITE = {
   // abused, delete the webhook in Discord and make a new one.
   // If both this and contactKey are set, messages go to both.
   discordWebhook: "https://discord.com/api/webhooks/1570211760487792780/ja1GaJCivsiUwT089lqqGCcgO2HHQwIh7uxMCZFiidtkd5oMYn2fxNsbHUiUl2_Obpzm",
+
+  // GoatCounter site code for visitor stats (free: goatcounter.com).
+  // If your dashboard is https://romanserius.goatcounter.com, the code is "romanserius".
+  // Leave empty to turn counting off. Test mode and localhost are never counted.
+  goatcounter: "",
+
+  // Public address of the site, used for search engines and link previews.
+  url: "https://roman-serius.github.io/daily-games/",
 };
