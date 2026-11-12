@@ -35,5 +35,5 @@ window.SITE = {
   goatcounter: "roman-serius",
 
   // Public address of the site, used for search engines and link previews.
-  url: "https://roman-serius.github.io/daily-games/",
+  url: "https://romanserius.com/daily-games/",
 };

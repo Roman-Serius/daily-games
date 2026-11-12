@@ -28,8 +28,10 @@ Testing tricks:
 
 ## Deploy to GitHub Pages
 
-1. Create a repo under Roman-Serius named `daily-games` (it will be served at
-   `https://roman-serius.github.io/daily-games/`).
+1. Create a repo under Roman-Serius named `daily-games`. Because the homepage repo
+   (`Roman-Serius.github.io`) uses the custom domain romanserius.com, this repo is
+   served at `https://romanserius.com/daily-games/` automatically (old
+   roman-serius.github.io links redirect there).
 2. From this folder:
    ```sh
    git init && git add . && git commit -m "Daily games: hub + Caesarle"

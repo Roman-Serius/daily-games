@@ -1,0 +1,201 @@
+/* Haikudle: magnetic poetry on a fridge door, in the Roman Serius palette.
+   Colours come from ../shared/style.css:
+   cream tiles = today's words, gold tiles = glue words. */
+
+[hidden] { display: none !important; }
+
+.hk {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 10px 14px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  min-height: calc(100dvh - 58px);
+}
+.title {
+  font-family: var(--serif);
+  font-weight: 600;
+  margin: 4px 0 0;
+  font-size: 1.6rem;
+  letter-spacing: 0.03em;
+  text-align: center;
+}
+.title small { color: var(--muted); font-size: 0.9rem; font-family: var(--mono); }
+
+.status { text-align: center; color: var(--muted); padding: 10px; }
+.status.error { color: var(--ink); background: rgba(200, 66, 59, 0.15); border: 1px solid var(--red); border-radius: var(--radius); }
+.status:empty { display: none; }
+
+/* ---------- The fridge door ---------- */
+.board {
+  background:
+    linear-gradient(115deg, rgba(255, 255, 255, 0.045) 0%, rgba(255, 255, 255, 0) 38%),
+    linear-gradient(180deg, var(--panel-2) 0%, var(--panel) 100%);
+  border: 1px solid #263a70;
+  border-radius: 18px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 10px 24px rgba(0, 0, 0, 0.25);
+  padding: 16px 16px 18px;
+}
+
+/* ---------- Magnets ---------- */
+.tile {
+  --tilt: 0deg;
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 6px 10px 3px;
+  border: 0;
+  border-radius: 2px;
+  background: var(--ink);
+  color: var(--bg);
+  font: 500 1.02rem/1.15 var(--serif);
+  letter-spacing: 0.01em;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2), 2px 3px 0 rgba(3, 8, 22, 0.55);
+  transform: rotate(var(--tilt));
+  cursor: pointer;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, opacity 0.15s;
+  user-select: none;
+}
+.tile:hover { transform: rotate(0deg) translateY(-2px); box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2), 3px 5px 0 rgba(3, 8, 22, 0.5); }
+.tile:active { transform: rotate(0deg) translateY(1px); box-shadow: 1px 1px 0 rgba(3, 8, 22, 0.5); }
+.tile:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
+.tile .pips { font-size: 0.5rem; line-height: 1; letter-spacing: 0.22em; color: rgba(13, 23, 48, 0.42); margin-top: 1px; min-height: 0.5rem; }
+
+.tile.glue { background: var(--gold); font-size: 0.92rem; padding: 5px 8px 2px; }
+.tile.glue .pips { color: rgba(13, 23, 48, 0.35); }
+
+.tile.used { opacity: 0.16; box-shadow: none; cursor: default; }
+.tile.used:hover, .tile:disabled:hover { transform: rotate(var(--tilt)); }
+.tile:disabled { cursor: default; }
+
+/* ---------- The three lines ---------- */
+.lines { display: grid; gap: 6px; margin-bottom: 14px; }
+.line {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 60px;
+  padding: 8px 4px 8px 22px;
+  border-bottom: 2px dashed rgba(169, 178, 204, 0.22);
+  cursor: pointer;
+  position: relative;
+}
+.line::before {
+  content: attr(data-n);
+  position: absolute;
+  left: 2px;
+  font: 0.8rem var(--mono);
+  color: var(--muted);
+}
+.line.active { border-bottom: 2px solid var(--gold); }
+.line.active::before { color: var(--gold); content: "▸"; }
+.line.full .count { color: var(--hit); }
+.line .slots { flex: 1; display: flex; flex-wrap: wrap; gap: 10px 8px; align-items: center; padding: 3px 0; }
+.line .placeholder { color: var(--muted); font-size: 0.85rem; font-style: italic; }
+.line .count { font-family: var(--mono); color: var(--muted); font-size: 0.9rem; min-width: 34px; text-align: right; }
+
+.rule { text-align: center; color: var(--muted); font-size: 0.85rem; min-height: 1.2em; margin: 0 0 16px; }
+.rule.bad { color: #ff8a80; }
+
+/* ---------- Tile trays ---------- */
+.tray + .tray { margin-top: 18px; }
+.tray-label {
+  display: block;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--muted);
+  margin: 0 0 12px;
+}
+.tray-label span { text-transform: none; letter-spacing: 0; opacity: 0.85; }
+.bank { display: flex; flex-wrap: wrap; gap: 12px 9px; justify-content: center; padding: 2px 4px 6px; }
+.bank.fillers { gap: 10px 7px; }
+
+.actions { display: flex; gap: 10px; justify-content: center; margin-top: 20px; }
+.btn:disabled { opacity: 0.45; cursor: default; }
+
+/* ---------- Finished poems (also built from magnets) ---------- */
+.poem { margin: 0; display: grid; gap: 10px; }
+.poem .row { display: flex; flex-wrap: wrap; gap: 8px 6px; align-items: center; }
+.poem .tile { cursor: default; font-size: 0.95rem; padding: 4px 8px; }
+.poem .tile.glue { font-size: 0.86rem; padding: 3px 7px; }
+.poem .tile:hover { transform: rotate(var(--tilt)); box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2), 2px 3px 0 rgba(3, 8, 22, 0.55); }
+.poem.small .tile { font-size: 0.86rem; padding: 3px 7px; }
+.poem.small .tile.glue { font-size: 0.8rem; }
+
+/* ---------- Yesterday's best ---------- */
+.best { padding: 12px 16px; }
+.best summary { cursor: pointer; font-family: var(--serif); color: var(--gold); font-size: 1.05rem; }
+.best summary small { color: var(--muted); font-family: var(--mono); font-size: 0.8rem; }
+.best ol { list-style: none; margin: 14px 0 2px; padding: 0; display: grid; gap: 16px; }
+.best li { display: grid; grid-template-columns: 28px 1fr auto; gap: 10px; align-items: start; }
+.best .medal { font-size: 1.2rem; line-height: 1.4; }
+.best .likes { color: var(--muted); font-family: var(--mono); font-size: 0.85rem; white-space: nowrap; }
+
+/* ---------- After posting ---------- */
+.mine { display: flex; flex-direction: column; gap: 14px; }
+.mine-label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.14em; color: var(--gold); }
+.mine-meta { color: var(--muted); font-size: 0.88rem; }
+.mine .actions { margin-top: 0; }
+.next { color: var(--muted); font-size: 0.85rem; text-align: center; }
+.next b { font-family: var(--mono); color: var(--ink); }
+
+/* ---------- Feed ---------- */
+.feed-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.feed-head h2 { font-family: var(--serif); color: var(--gold); margin: 0; font-size: 1.25rem; }
+.sorts { display: flex; gap: 6px; }
+.sort {
+  background: none;
+  border: 1px solid var(--panel-2);
+  color: var(--muted);
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+.sort.on { color: var(--bg); background: var(--gold); border-color: var(--gold); font-weight: 700; }
+
+#feed { display: grid; gap: 12px; margin-top: 12px; }
+.entry { padding: 14px 14px 8px; border-radius: 14px; }
+.entry.own { border-color: rgba(227, 180, 72, 0.55); }
+.entry-foot { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; }
+.entry-foot .when { color: var(--muted); font-size: 0.78rem; }
+.entry-foot .right { display: flex; align-items: center; gap: 4px; }
+.like {
+  background: none;
+  border: 1px solid transparent;
+  color: var(--muted);
+  border-radius: 999px;
+  padding: 5px 10px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  font-family: var(--mono);
+}
+.like:hover { border-color: var(--panel-2); }
+.like.on { color: var(--red); }
+.like:disabled { cursor: default; }
+.like:disabled:hover { border-color: transparent; }
+.flag { background: none; border: 0; color: var(--muted); opacity: 0.5; cursor: pointer; font-size: 0.85rem; padding: 5px; }
+.flag:hover { opacity: 1; }
+.flag:disabled { cursor: default; opacity: 0.3; }
+.yours { color: var(--gold); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em; }
+.empty { color: var(--muted); text-align: center; padding: 18px 0; }
+.more { align-self: center; margin-top: 12px; }
+
+/* ---------- Help + footer ---------- */
+.legend { list-style: none; padding: 0; display: grid; gap: 12px; }
+.legend li { display: flex; align-items: center; gap: 12px; }
+.legend .tile { cursor: default; flex: none; }
+.about { max-width: 600px; margin: 10px auto 30px; padding: 0 14px; color: var(--muted); font-size: 0.88rem; }
+.about h2 { font-family: var(--serif); color: var(--ink); font-size: 1.05rem; }
+.muted { color: var(--muted); font-size: 0.88rem; }
+kbd { font-family: var(--mono); background: var(--panel-2); border-radius: 4px; padding: 1px 5px; font-size: 0.8em; }
+
+@media (max-width: 420px) {
+  .board { padding: 14px 10px 16px; border-radius: 14px; }
+  .tile { font-size: 0.96rem; padding: 5px 8px 3px; }
+  .tile.glue { font-size: 0.86rem; padding: 4px 7px 2px; }
+  .bank { gap: 11px 7px; }
+}

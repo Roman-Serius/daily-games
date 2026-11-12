@@ -1,1 +1,5 @@
 .DS_Store
+
+# Haikudle: secret seed and generated future draws
+haikudle/tools/.draw-seed
+haikudle/tools/out/
