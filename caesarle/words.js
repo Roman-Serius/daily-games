@@ -9,87 +9,87 @@ window.CAESARLE_SCHEDULE = {
   // "2026-10-31": { word: "ghost" },
 };
 
-// CAESARLE_ANSWERS: the play order. Word 1 is day 1 (Nov 11, 2026), word 2 is
+// CAESARLE_ANSWERS: the play order. Word 1 is day 1 (Nov 12, 2026), word 2 is
 //   day 2, and so on. When it runs out it starts again from the top.
 //   - ADD new words at the END only.
 //   - To change an upcoming word, replace it in place (same position).
 //   - Never delete, insert or reorder words above today: every later day
 //     would shift by one, and past puzzles would change.
 window.CAESARLE_ANSWERS = `
-plate wrath elder remix upset spray usual piece vocal clock // days 1-10: Nov 11, 2026 to Nov 20, 2026
-cocoa queen woven minor audio route exile ahead eager quack // days 11-20: Nov 21, 2026 to Nov 30, 2026
-irony muddy fleet award scarf logic night every toast bread // days 21-30: Dec 1, 2026 to Dec 10, 2026
-price lemon usage stick relay curve depth tumor under press // days 31-40: Dec 11, 2026 to Dec 20, 2026
-stake oasis sonic voice value burst raise eagle diary false // days 41-50: Dec 21, 2026 to Dec 30, 2026
-heart rifle brisk linen scrap mayor pearl tough paper pilot // days 51-60: Dec 31, 2026 to Jan 9, 2027
-grind group reply puppy point extra skull class basic fudge // days 61-70: Jan 10, 2027 to Jan 19, 2027
-craft jumbo proof among karma grace voter ledge ideal image // days 71-80: Jan 20, 2027 to Jan 29, 2027
-shirt cause plead flame paint yield verse blaze honey teach // days 81-90: Jan 30, 2027 to Feb 8, 2027
-carry waltz forth forum coach rally grade funny slide force // days 91-100: Feb 9, 2027 to Feb 18, 2027
-debut sunny march scout drawn black mouse serve ghost urban // days 101-110: Feb 19, 2027 to Feb 28, 2027
-thick weird where nerve youth camel essay blind knock until // days 111-120: Mar 1, 2027 to Mar 10, 2027
-board bloom ridge laugh sport start ferry cling brief chess // days 121-130: Mar 11, 2027 to Mar 20, 2027
-sharp grape amber viper straw crest pound polar merit sleep // days 131-140: Mar 21, 2027 to Mar 30, 2027
-admit crowd empty flock viola brook chalk angry fresh shame // days 141-150: Mar 31, 2027 to Apr 9, 2027
-meter harsh tribe label phone fancy least water tight pedal // days 151-160: Apr 10, 2027 to Apr 19, 2027
-scone since unity shade ankle frame mango quite fiber speed // days 161-170: Apr 20, 2027 to Apr 29, 2027
-fruit cedar break brick grave outer taste beach greet cover // days 171-180: Apr 30, 2027 to May 9, 2027
-prove gloom after timer solid shift dance might bring smart // days 181-190: May 10, 2027 to May 19, 2027
-angel guide pouch armor grill drive hello quest death drain // days 191-200: May 20, 2027 to May 29, 2027
-rival asset novel guild pupil spark raven slate close short // days 201-210: May 30, 2027 to Jun 8, 2027
-joint happy trade truck wedge print steep young forty enemy // days 211-220: Jun 9, 2027 to Jun 18, 2027
-wagon robot grain arrow waste nurse ounce spare study count // days 221-230: Jun 19, 2027 to Jun 28, 2027
-offer stuff title blast mercy actor canoe realm north spear // days 231-240: Jun 29, 2027 to Jul 8, 2027
-peace given blank lunar seven mouth shelf index steam haunt // days 241-250: Jul 9, 2027 to Jul 18, 2027
-haste watch donor level guess frost humor chase weave cloud // days 251-260: Jul 19, 2027 to Jul 28, 2027
-grown siege prize coral photo twist bench toxic eight shark // days 261-270: Jul 29, 2027 to Aug 7, 2027
-punch ivory theme onion tulip adopt cheer lucky lodge thorn // days 271-280: Aug 8, 2027 to Aug 17, 2027
-crash adult cross medal power chest brain ranch oxide skate // days 281-290: Aug 18, 2027 to Aug 27, 2027
-tower grief cabin space shout dress adapt torch relax alert // days 291-300: Aug 28, 2027 to Sep 6, 2027
-elite climb river pause sound basin cream loyal smoke total // days 301-310: Sep 7, 2027 to Sep 16, 2027
-witch daily flood trace chair share order visit spoon bleak // days 311-320: Sep 17, 2027 to Sep 26, 2027
-valve pulse naive pride claim boast being float glass crazy // days 321-330: Sep 27, 2027 to Oct 6, 2027
-wheat could radio awful solve think chief yearn later child // days 331-340: Oct 7, 2027 to Oct 16, 2027
-liver train fluid smile sword troop valid pizza spine begin // days 341-350: Oct 17, 2027 to Oct 26, 2027
-beard stair arena blown spill dizzy spend beast lower truth // days 351-360: Oct 27, 2027 to Nov 5, 2027
-fence focus story rough patch flour melon great skill scale // days 361-370: Nov 6, 2027 to Nov 15, 2027
-truly noble roast floor brand globe proud again fully flute // days 371-380: Nov 16, 2027 to Nov 25, 2027
-about music scene worry exact piano syrup gauge draft drama // days 381-390: Nov 26, 2027 to Dec 5, 2027
-alone bless sight doubt thing vinyl crumb widow ultra badge // days 391-400: Dec 6, 2027 to Dec 15, 2027
-crisp speak maple house grass penny prism faith swift snake // days 401-410: Dec 16, 2027 to Dec 25, 2027
-input whole squad porch alter trend gleam wheel union mount // days 411-420: Dec 26, 2027 to Jan 4, 2028
-groan still those stern chill rocky wince vivid cycle rebel // days 421-430: Jan 5, 2028 to Jan 14, 2028
-along cheap shock white whale broom crack argue build stain // days 431-440: Jan 15, 2028 to Jan 24, 2028
-brown human tiger anger alien trial lover storm yacht peach // days 441-450: Jan 25, 2028 to Feb 3, 2028
-rural grand react candy weary otter thumb graph uncle prime // days 451-460: Feb 4, 2028 to Feb 13, 2028
-broad reach fever party cubic entry jewel elect pasta swing // days 461-470: Feb 14, 2028 to Feb 23, 2028
-labor plant sweet quiet clown giant blade royal place equal // days 471-480: Feb 24, 2028 to Mar 4, 2028
-rhyme orbit early hurry catch model vapor phase greed crime // days 481-490: Mar 5, 2028 to Mar 14, 2028
-right slice boost write refer light token trail lease while // days 491-500: Mar 15, 2028 to Mar 24, 2028
-enter organ plane stack trunk strip state arise fable civic // days 501-510: Mar 25, 2028 to Apr 3, 2028
-exist opera stone habit third album treat agree steel crown // days 511-520: Apr 4, 2028 to Apr 13, 2028
-other angle event venue guest check lunch loose surge brake // days 521-530: Apr 14, 2028 to Apr 23, 2028
-match quote marsh suite pitch magic query elbow horse clear // days 531-540: Apr 24, 2028 to May 3, 2028
-flash plaza world fight thief woman metal width brave bonus // days 541-550: May 4, 2028 to May 13, 2028
-quick zebra quilt month manor stand delay sheep chain stare // days 551-560: May 14, 2028 to May 23, 2028
-hedge block guard stool crane maker agent clerk notch salad // days 561-570: May 24, 2028 to Jun 2, 2028
-found shake sauce shine swamp snack teeth cheek green round // days 571-580: Jun 3, 2028 to Jun 12, 2028
-drink topic solar trust plush fifty enjoy trout range charm // days 581-590: Jun 13, 2028 to Jun 22, 2028
-quill baker earth ready coast limit ruler knife comet olive // days 591-600: Jun 23, 2028 to Jul 2, 2028
-panel fifth three swear bunch super avoid grant vault wreck // days 601-610: Jul 3, 2028 to Jul 12, 2028
-panic trait shore plain kayak whirl clash brush front midst // days 611-620: Jul 13, 2028 to Jul 22, 2028
-vital alive judge moral villa berry hotel error perch dealt // days 621-630: Jul 23, 2028 to Aug 1, 2028
-owner cough cargo feast cliff saint above sugar rigid large // days 631-640: Aug 2, 2028 to Aug 11, 2028
-learn upper money apply heavy chart video major bride throw // days 641-650: Aug 12, 2028 to Aug 21, 2028
-grasp stove virus dough couch thank motor sense birth blend // days 651-660: Aug 22, 2028 to Aug 31, 2028
-drift ought table court legal dream often silly jelly honor // days 661-670: Sep 1, 2028 to Sep 10, 2028
-laser choir aware trick booth touch creek cable style vigor // days 671-680: Sep 11, 2028 to Sep 20, 2028
-movie wrist robin sheet mirth south noise crawl glove pixel // days 681-690: Sep 21, 2028 to Sep 30, 2028
-fraud scent shell slope pinch field never blame wrong aside // days 691-700: Oct 1, 2028 to Oct 10, 2028
-skirt stage inner stamp spell wound twice grove allow dodge // days 701-710: Oct 11, 2028 to Oct 20, 2028
-latch quota staff spice ocean glory bacon acute track dairy // days 711-720: Oct 21, 2028 to Oct 30, 2028
-flesh shape frank rapid layer final decay clean weigh cloth // days 721-730: Oct 31, 2028 to Nov 9, 2028
-juice worth crust forge radar alarm apple                   // days 731-737: Nov 10, 2028 to Nov 16, 2028
+plate wrath elder remix upset spray usual piece vocal clock // days 1-10: Nov 12, 2026 to Nov 21, 2026
+cocoa queen woven minor audio route exile ahead eager quack // days 11-20: Nov 22, 2026 to Dec 1, 2026
+irony muddy fleet award scarf logic night every toast bread // days 21-30: Dec 2, 2026 to Dec 11, 2026
+price lemon usage stick relay curve depth tumor under press // days 31-40: Dec 12, 2026 to Dec 21, 2026
+stake oasis sonic voice value burst raise eagle diary false // days 41-50: Dec 22, 2026 to Dec 31, 2026
+heart rifle brisk linen scrap mayor pearl tough paper pilot // days 51-60: Jan 1, 2027 to Jan 10, 2027
+grind group reply puppy point extra skull class basic fudge // days 61-70: Jan 11, 2027 to Jan 20, 2027
+craft jumbo proof among karma grace voter ledge ideal image // days 71-80: Jan 21, 2027 to Jan 30, 2027
+shirt cause plead flame paint yield verse blaze honey teach // days 81-90: Jan 31, 2027 to Feb 9, 2027
+carry waltz forth forum coach rally grade funny slide force // days 91-100: Feb 10, 2027 to Feb 19, 2027
+debut sunny march scout drawn black mouse serve ghost urban // days 101-110: Feb 20, 2027 to Mar 1, 2027
+thick weird where nerve youth camel essay blind knock until // days 111-120: Mar 2, 2027 to Mar 11, 2027
+board bloom ridge laugh sport start ferry cling brief chess // days 121-130: Mar 12, 2027 to Mar 21, 2027
+sharp grape amber viper straw crest pound polar merit sleep // days 131-140: Mar 22, 2027 to Mar 31, 2027
+admit crowd empty flock viola brook chalk angry fresh shame // days 141-150: Apr 1, 2027 to Apr 10, 2027
+meter harsh tribe label phone fancy least water tight pedal // days 151-160: Apr 11, 2027 to Apr 20, 2027
+scone since unity shade ankle frame mango quite fiber speed // days 161-170: Apr 21, 2027 to Apr 30, 2027
+fruit cedar break brick grave outer taste beach greet cover // days 171-180: May 1, 2027 to May 10, 2027
+prove gloom after timer solid shift dance might bring smart // days 181-190: May 11, 2027 to May 20, 2027
+angel guide pouch armor grill drive hello quest death drain // days 191-200: May 21, 2027 to May 30, 2027
+rival asset novel guild pupil spark raven slate close short // days 201-210: May 31, 2027 to Jun 9, 2027
+joint happy trade truck wedge print steep young forty enemy // days 211-220: Jun 10, 2027 to Jun 19, 2027
+wagon robot grain arrow waste nurse ounce spare study count // days 221-230: Jun 20, 2027 to Jun 29, 2027
+offer stuff title blast mercy actor canoe realm north spear // days 231-240: Jun 30, 2027 to Jul 9, 2027
+peace given blank lunar seven mouth shelf index steam haunt // days 241-250: Jul 10, 2027 to Jul 19, 2027
+haste watch donor level guess frost humor chase weave cloud // days 251-260: Jul 20, 2027 to Jul 29, 2027
+grown siege prize coral photo twist bench toxic eight shark // days 261-270: Jul 30, 2027 to Aug 8, 2027
+punch ivory theme onion tulip adopt cheer lucky lodge thorn // days 271-280: Aug 9, 2027 to Aug 18, 2027
+crash adult cross medal power chest brain ranch oxide skate // days 281-290: Aug 19, 2027 to Aug 28, 2027
+tower grief cabin space shout dress adapt torch relax alert // days 291-300: Aug 29, 2027 to Sep 7, 2027
+elite climb river pause sound basin cream loyal smoke total // days 301-310: Sep 8, 2027 to Sep 17, 2027
+witch daily flood trace chair share order visit spoon bleak // days 311-320: Sep 18, 2027 to Sep 27, 2027
+valve pulse naive pride claim boast being float glass crazy // days 321-330: Sep 28, 2027 to Oct 7, 2027
+wheat could radio awful solve think chief yearn later child // days 331-340: Oct 8, 2027 to Oct 17, 2027
+liver train fluid smile sword troop valid pizza spine begin // days 341-350: Oct 18, 2027 to Oct 27, 2027
+beard stair arena blown spill dizzy spend beast lower truth // days 351-360: Oct 28, 2027 to Nov 6, 2027
+fence focus story rough patch flour melon great skill scale // days 361-370: Nov 7, 2027 to Nov 16, 2027
+truly noble roast floor brand globe proud again fully flute // days 371-380: Nov 17, 2027 to Nov 26, 2027
+about music scene worry exact piano syrup gauge draft drama // days 381-390: Nov 27, 2027 to Dec 6, 2027
+alone bless sight doubt thing vinyl crumb widow ultra badge // days 391-400: Dec 7, 2027 to Dec 16, 2027
+crisp speak maple house grass penny prism faith swift snake // days 401-410: Dec 17, 2027 to Dec 26, 2027
+input whole squad porch alter trend gleam wheel union mount // days 411-420: Dec 27, 2027 to Jan 5, 2028
+groan still those stern chill rocky wince vivid cycle rebel // days 421-430: Jan 6, 2028 to Jan 15, 2028
+along cheap shock white whale broom crack argue build stain // days 431-440: Jan 16, 2028 to Jan 25, 2028
+brown human tiger anger alien trial lover storm yacht peach // days 441-450: Jan 26, 2028 to Feb 4, 2028
+rural grand react candy weary otter thumb graph uncle prime // days 451-460: Feb 5, 2028 to Feb 14, 2028
+broad reach fever party cubic entry jewel elect pasta swing // days 461-470: Feb 15, 2028 to Feb 24, 2028
+labor plant sweet quiet clown giant blade royal place equal // days 471-480: Feb 25, 2028 to Mar 5, 2028
+rhyme orbit early hurry catch model vapor phase greed crime // days 481-490: Mar 6, 2028 to Mar 15, 2028
+right slice boost write refer light token trail lease while // days 491-500: Mar 16, 2028 to Mar 25, 2028
+enter organ plane stack trunk strip state arise fable civic // days 501-510: Mar 26, 2028 to Apr 4, 2028
+exist opera stone habit third album treat agree steel crown // days 511-520: Apr 5, 2028 to Apr 14, 2028
+other angle event venue guest check lunch loose surge brake // days 521-530: Apr 15, 2028 to Apr 24, 2028
+match quote marsh suite pitch magic query elbow horse clear // days 531-540: Apr 25, 2028 to May 4, 2028
+flash plaza world fight thief woman metal width brave bonus // days 541-550: May 5, 2028 to May 14, 2028
+quick zebra quilt month manor stand delay sheep chain stare // days 551-560: May 15, 2028 to May 24, 2028
+hedge block guard stool crane maker agent clerk notch salad // days 561-570: May 25, 2028 to Jun 3, 2028
+found shake sauce shine swamp snack teeth cheek green round // days 571-580: Jun 4, 2028 to Jun 13, 2028
+drink topic solar trust plush fifty enjoy trout range charm // days 581-590: Jun 14, 2028 to Jun 23, 2028
+quill baker earth ready coast limit ruler knife comet olive // days 591-600: Jun 24, 2028 to Jul 3, 2028
+panel fifth three swear bunch super avoid grant vault wreck // days 601-610: Jul 4, 2028 to Jul 13, 2028
+panic trait shore plain kayak whirl clash brush front midst // days 611-620: Jul 14, 2028 to Jul 23, 2028
+vital alive judge moral villa berry hotel error perch dealt // days 621-630: Jul 24, 2028 to Aug 2, 2028
+owner cough cargo feast cliff saint above sugar rigid large // days 631-640: Aug 3, 2028 to Aug 12, 2028
+learn upper money apply heavy chart video major bride throw // days 641-650: Aug 13, 2028 to Aug 22, 2028
+grasp stove virus dough couch thank motor sense birth blend // days 651-660: Aug 23, 2028 to Sep 1, 2028
+drift ought table court legal dream often silly jelly honor // days 661-670: Sep 2, 2028 to Sep 11, 2028
+laser choir aware trick booth touch creek cable style vigor // days 671-680: Sep 12, 2028 to Sep 21, 2028
+movie wrist robin sheet mirth south noise crawl glove pixel // days 681-690: Sep 22, 2028 to Oct 1, 2028
+fraud scent shell slope pinch field never blame wrong aside // days 691-700: Oct 2, 2028 to Oct 11, 2028
+skirt stage inner stamp spell wound twice grove allow dodge // days 701-710: Oct 12, 2028 to Oct 21, 2028
+latch quota staff spice ocean glory bacon acute track dairy // days 711-720: Oct 22, 2028 to Oct 31, 2028
+flesh shape frank rapid layer final decay clean weigh cloth // days 721-730: Nov 1, 2028 to Nov 10, 2028
+juice worth crust forge radar alarm apple                   // days 731-737: Nov 11, 2028 to Nov 17, 2028
 `.replace(/\/\/.*$/gm, "").trim().split(/\s+/);
 
 // CAESARLE_VALID: every word accepted as a guess (Hunspell en_US dictionary

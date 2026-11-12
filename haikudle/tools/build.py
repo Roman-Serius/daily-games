@@ -9,7 +9,7 @@ Haikudle word pool + daily draw builder.
 
 Then paste out/load.sql into Supabase -> SQL Editor -> Run.
 
-Safe to re-run any time (after editing words.csv, the recipe, or themes.csv):
+Safe to re-run any time (after editing words.csv, the recipe, or schedule.csv):
 the SQL updates the word list and replaces draws for FUTURE days only.
 Today and past days are never changed, because people have already played them.
 
@@ -31,7 +31,7 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 WORDS_CSV = HERE / "words.csv"
-THEMES_CSV = HERE / "themes.csv"   # optional
+SCHEDULE_CSV = HERE / "schedule.csv"   # optional: curate specific dates (see load_schedule)
 SEED_FILE = HERE / ".draw-seed"
 OUT_DIR = HERE / "out"
 
@@ -124,31 +124,62 @@ def load_words():
     return words
 
 
-def load_themes(by_word):
-    """Optional themes.csv: day,theme,words  (words = space-separated, must be in words.csv)"""
-    themes = {}
-    if not THEMES_CSV.exists():
-        return themes
-    with THEMES_CSV.open(newline="", encoding="utf-8") as f:
-        for row in csv.DictReader(f):
-            day = int(row["day"])
-            forced = (row.get("words") or "").lower().split()
-            for w in forced:
+LAUNCH = __import__("datetime").date(2026, 11, 12)   # Haikudle day #1
+
+
+def load_schedule(by_word):
+    """schedule.csv: curate specific dates, like Caesarle's CAESARLE_SCHEDULE.
+
+        date,theme,words
+        2026-12-25,winter,snow candle bell        <- these words are guaranteed; the rest is drawn as usual
+        2026-10-31,,ghost moth lantern ... (18)   <- 18 words = exactly that draw, nothing added
+
+    theme is optional (just a note for you). Words must be in words.csv.
+    Dates that are today or already past are ignored by the database anyway."""
+    import datetime
+    sched = {}
+    if not SCHEDULE_CSV.exists():
+        return sched
+    full = sum(RECIPE.values())
+    with SCHEDULE_CSV.open(newline="", encoding="utf-8") as f:
+        for line, row in enumerate(csv.DictReader(f), start=2):
+            raw = (row.get("date") or "").strip()
+            if not raw or raw.startswith("#"):
+                continue
+            try:
+                date = datetime.date.fromisoformat(raw)
+            except ValueError:
+                die(f"schedule.csv line {line}: date must look like 2026-12-25 (got '{raw}')")
+            day = (date - LAUNCH).days + 1
+            if day < 1:
+                die(f"schedule.csv line {line}: {raw} is before Haikudle started")
+            words = (row.get("words") or "").lower().replace(",", " ").split()
+            for w in words:
                 if w not in by_word:
-                    die(f"themes.csv day {day}: '{w}' isn't in words.csv")
-            themes[day] = {"theme": (row.get("theme") or "").strip() or None, "words": forced}
-    return themes
+                    die(f"schedule.csv line {line} ({raw}): '{w}' isn't in words.csv (add it there first)")
+            if len(set(words)) != len(words):
+                die(f"schedule.csv line {line} ({raw}): a word is listed twice")
+            if len(words) > full:
+                die(f"schedule.csv line {line} ({raw}): {len(words)} words; a day holds {full}")
+            if date <= datetime.date.today():
+                print(f"note: schedule.csv {raw} is today or past, so it won't change anything")
+            sched[day] = {"theme": (row.get("theme") or "").strip() or None, "words": words,
+                          "full": len(words) == full, "date": raw}
+    return sched
 
 
-def check_syllables(words, cmudict_path=None):
+def check_syllables(words, cmudict_path=None, verbose=True):
     warnings = []
     for w in words:
         g = guess_syllables(w["word"])
         if g != w["syllables"]:
             warnings.append(f"  {w['word']}: csv says {w['syllables']}, rule of thumb says {g}")
-    print(f"{len(warnings)} words where the rule of thumb disagrees (usually the rule is wrong;"
-          " worth a glance):")
-    print("\n".join(warnings) if warnings else "  none")
+    if not verbose:
+        print(f"{len(warnings)} syllable counts to double-check (python3 build.py --check lists them)")
+    else:
+        print(f"{len(warnings)} words where the rule of thumb disagrees (usually the rule is wrong;"
+              " worth a glance):")
+        print("\n".join(warnings) if warnings else "  none")
 
     if cmudict_path:
         prons = {}
@@ -201,8 +232,8 @@ def make_draws(words, themes, last_day, seed):
         rng = random.Random(f"{seed}:{day}")
         forced = [by_word[w] for w in themes.get(day, {}).get("words", [])]
         spacing = SPACING_DAYS
-        draw = None
-        for attempt in range(400):
+        draw = list(forced) if themes.get(day, {}).get("full") else None
+        for attempt in range(0 if draw else 400):
             if attempt and attempt % 100 == 0:
                 spacing //= 2           # pool too thin for the spacing: relax it
             pick = list(forced)
@@ -226,11 +257,14 @@ def make_draws(words, themes, last_day, seed):
                 draw = pick
                 break
         if draw is None:
-            die(f"couldn't build a valid draw for day {day}; add more words or loosen the recipe")
+            when = themes.get(day, {}).get("date")
+            die(f"couldn't build a valid draw for day {day}" + (f" ({when}: check that day's pinned words in schedule.csv)" if when else "")
+                + "; add more words or loosen the recipe")
         for w in draw:
             last_used[w["word"]] = day
         draw.sort(key=lambda w: (list(RECIPE).index(w["pos"]) if w["pos"] in RECIPE else 9, w["word"]))
-        draws[day] = {"words": draw, "theme": themes.get(day, {}).get("theme")}
+        draws[day] = {"words": draw, "theme": themes.get(day, {}).get("theme"),
+                      "pinned": "all" if themes.get(day, {}).get("full") else (len(forced) or None)}
     return draws
 
 
@@ -276,10 +310,13 @@ def write_sql(words, draws, first_day):
         "  set word_ids = excluded.word_ids, theme = excluded.theme",
         "  where haikudle.draws.day > haikudle.current_day();",
         "",
-        "-- Sanity check: every draw found all its words.",
+        "-- Sanity check: every future draw found all of its words.",
+        "create temp table hk_expected (day int primary key, n int) on commit drop;",
+        "insert into hk_expected values " + ", ".join(
+            f"({d},{len(draws[d]['words'])})" for d in sorted(draws) if d >= first_day) + ";",
         "do $$ begin",
-        "  if exists (select 1 from haikudle.draws d where d.day > haikudle.current_day()",
-        f"            and cardinality(d.word_ids) <> {sum(RECIPE.values())}) then",
+        "  if exists (select 1 from haikudle.draws d join hk_expected e on e.day = d.day",
+        "            where d.day > haikudle.current_day() and cardinality(d.word_ids) <> e.n) then",
         "    raise exception 'a future draw is missing words; nothing was saved';",
         "  end if;",
         "end $$;",
@@ -295,8 +332,12 @@ def write_sql(words, draws, first_day):
         for d in sorted(draws):
             if d < first_day:
                 continue
-            theme = f"  [{draws[d]['theme']}]" if draws[d]["theme"] else ""
-            f.write(f"#{d}{theme}\n")
+            import datetime as _dt
+            date = (LAUNCH + _dt.timedelta(days=d - 1)).isoformat()
+            pin = draws[d].get("pinned")
+            theme = (f"  [{draws[d]['theme']}]" if draws[d]["theme"] else "") + \
+                    ("  (curated: all words)" if pin == "all" else f"  (curated: {pin} words)" if pin else "")
+            f.write(f"#{d}  {date}{theme}\n")
             for p in RECIPE:
                 ws = [f"{w['word']}({w['syllables']})" for w in draws[d]["words"] if w["pos"] == p]
                 f.write(f"  {p:5} {', '.join(ws)}\n")
@@ -319,13 +360,13 @@ def main():
     print(f"{len(words)} words: " + ", ".join(f"{counts[p]} {p}" for p in sorted(counts)))
     print("by syllables: " + ", ".join(f"{k if k < 4 else '4+'}: {syl[k]}" for k in sorted(syl)))
     print()
-    check_syllables(words, args.cmudict)
+    check_syllables(words, args.cmudict, verbose=args.check or bool(args.cmudict))
     if args.check:
         return
 
     by_word = {w["word"]: w for w in words}
-    themes = load_themes(by_word)
-    themes = {d + DAY_SHIFT: v for d, v in themes.items()}   # themes.csv uses published day numbers
+    themes = load_schedule(by_word)
+    themes = {d + DAY_SHIFT: v for d, v in themes.items()}   # schedule.csv uses published day numbers
     draws = make_draws(words, themes, args.to + DAY_SHIFT, get_seed())
     draws = {d - DAY_SHIFT: v for d, v in draws.items() if d > DAY_SHIFT}
     out, preview = write_sql(words, draws, args.first)

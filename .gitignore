@@ -1,5 +1,7 @@
 .DS_Store
 
-# Haikudle: secret seed and generated future draws
+# Haikudle: secrets (seed, future draws, curated days, database login)
 haikudle/tools/.draw-seed
 haikudle/tools/out/
+haikudle/tools/schedule.csv
+haikudle/tools/.supabase-db-url

@@ -15,7 +15,7 @@ haikudle/
   tools/
     words.csv      the word pool: word, syllables, pos (edit freely)
     build.py       checks words.csv and builds the daily draws
-    themes.csv     optional: hand-picked words / themes for specific days
+    schedule.csv   optional: curate specific dates (like Caesarle's schedule)
     .draw-seed     SECRET random seed (git-ignored)
     out/           SECRET generated SQL + preview of future draws (git-ignored)
 ```
@@ -44,13 +44,45 @@ least 4 one-syllable words and 2–3 longer ones. A word doesn't come back withi
 30 days, and related forms (drift / drifting) never share a draw. All of this is
 set at the top of `build.py`.
 
-`out/preview.txt` lists every future draw, so you can look ahead. If you don't
-like a day, force words into it with `themes.csv`:
+`out/preview.txt` lists every future draw with its date, so you can look ahead.
+
+### Curating days (like Caesarle's schedule)
+
+Add a line to `tools/schedule.csv` for any date:
 
 ```csv
-day,theme,words
-45,first frost,frost snowflake shiver
+date,theme,words
+2026-12-25,christmas,snow candle bell
+2026-12-31,new year,moth rain stone moon frost train bone salt smoke ash dusk dawn kettle lantern river window drift hum
 ```
+
+- **A few words** are guaranteed in that day's draw; the rest is drawn as usual.
+- **18 words** make exactly that day's draw.
+- `theme` is just a note for you; players don't see it.
+- Words must already be in `words.csv` (add them there first, with syllables).
+
+Then publish it (below), or run `python3 build.py` and paste `out/load.sql` into
+Supabase by hand (your saved "Haikudle – words & draws" query). Only future days change; today and the past never do.
+To swap out one word you don't like on a coming day, pin a few words for that date,
+or remove the word from `words.csv` and rebuild.
+
+### Publishing in one command
+
+`tools/publish.sh` rebuilds and uploads in one go, no copy-paste:
+
+```sh
+cd ~/Developer/daily-games/haikudle/tools
+./publish.sh             # after editing words.csv or schedule.csv
+./publish.sh --schema    # after changing supabase/schema.sql too
+./publish.sh --to 730    # next October: build another year of draws
+```
+
+One-time setup:
+1. Install psql: `brew install libpq` (or install Postgres.app).
+2. In Supabase, click **Connect** (top of the project), choose **Session pooler**, and copy
+   the URI. Replace `[YOUR-PASSWORD]` with your database password (Project Settings →
+   Database → reset it there if you don't know it).
+3. Save it as `tools/.supabase-db-url` (one line). It's git-ignored; never share it.
 
 **Keep the seed secret.** Draws are shuffled using `.draw-seed`, so anyone with that
 file could predict them. It and `out/` are git-ignored; back up `.draw-seed`
