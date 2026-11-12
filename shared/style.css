@@ -48,6 +48,19 @@ a { color: var(--gold); }
 .topbar .brand span { color: var(--red); }
 .topbar nav { display: flex; gap: 6px; }
 
+/* Site links: the same bar as romanserius.com/games/ (homepage repo: assets/roman-serius.css) */
+.topbar .site-nav { gap: 16px; margin-right: auto; margin-left: 6px; }
+.site-nav a { color: var(--muted); text-decoration: none; font-size: 0.92rem; }
+.site-nav a:hover, .site-nav a[aria-current="page"] { color: var(--ink); }
+.site-nav a[aria-current="page"] { border-bottom: 2px solid var(--red); padding-bottom: 2px; }
+.topbar .brand { white-space: nowrap; }
+@media (max-width: 560px) { .topbar.has-tools .site-nav { display: none; } }
+@media (max-width: 420px) {
+  .topbar { gap: 8px; padding: 10px 12px; }
+  .topbar .site-nav { gap: 11px; margin-left: 2px; }
+  .site-nav a { font-size: 0.84rem; }
+}
+
 .icon-btn {
   background: none;
   border: 1px solid var(--panel-2);
