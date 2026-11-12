@@ -45,7 +45,7 @@ All links are relative, so the site works at a sub-path or on a custom domain.
 
 ## How "daily" works
 
-`Daily.dayNumber()` counts days since launch (Nov 11, 2026 = #1) by the player's
+`Daily.dayNumber()` counts days since launch (Nov 12, 2026 = #1) by the player's
 local calendar date, like Wordle. Each game picks today's content with
 `Daily.pick(list, "gameId")`, which shuffles the list with a fixed seed and walks
 through it, so nothing repeats until the list runs out. Caesarle has 737 answers,

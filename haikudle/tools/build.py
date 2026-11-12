@@ -42,6 +42,11 @@ MIN_LONG = 2             # at least this many words of 3+ syllables...
 MAX_VERY_LONG = 2        # ...but at most this many of 4+
 SPACING_DAYS = 30        # a word doesn't come back within this many days
 
+# The game launched on Nov 11, then restarted its count so Nov 12, 2026 is day #1.
+# Draws are still generated in the original order (so they match what's already in
+# the database); generated day N is published as day N - DAY_SHIFT.
+DAY_SHIFT = 1
+
 # Must match the filler words in supabase/schema.sql.
 FILLERS = set("""a an the i you it we they me my your its is are was be of to in on at
 by with from for through and but or as if so not no this that all""".split())
@@ -320,7 +325,9 @@ def main():
 
     by_word = {w["word"]: w for w in words}
     themes = load_themes(by_word)
-    draws = make_draws(words, themes, args.to, get_seed())
+    themes = {d + DAY_SHIFT: v for d, v in themes.items()}   # themes.csv uses published day numbers
+    draws = make_draws(words, themes, args.to + DAY_SHIFT, get_seed())
+    draws = {d - DAY_SHIFT: v for d, v in draws.items() if d > DAY_SHIFT}
     out, preview = write_sql(words, draws, args.first)
 
     used = Counter(w["word"] for d in draws.values() for w in d["words"])

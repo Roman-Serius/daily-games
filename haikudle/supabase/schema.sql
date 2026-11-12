@@ -8,7 +8,7 @@
 -- Rules it enforces (all on the server, so nobody can cheat from the browser):
 --   * A day runs midnight-to-midnight at UTC-12, so it changes at 12:00 UTC
 --     (4am Pacific / 7am Eastern in winter, an hour later in summer).
---     Day #1 = 2026-11-11, the same numbering as the rest of the site.
+--     Day #1 = 2026-11-12, the same numbering as the rest of the site.
 --   * Each day has a draw of words. You can't see a day's draw before it starts.
 --   * A haiku is 3 lines of 5-7-5 syllables, built from word IDs.
 --     Draw words: each one used at most once. Glue (filler) words: at most 7.
@@ -110,7 +110,7 @@ create table if not exists haikudle.daily_top (
 -- and it never shifts for daylight saving.
 create or replace function haikudle.current_day()
 returns int language sql stable set search_path = haikudle, public as $$
-  select ((now() at time zone 'Etc/GMT+12')::date - date '2026-11-11') + 1;
+  select ((now() at time zone 'Etc/GMT+12')::date - date '2026-11-12') + 1;
 $$;
 
 -- When the current day ends (the next changeover), as a timestamp.

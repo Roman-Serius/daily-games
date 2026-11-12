@@ -65,7 +65,7 @@ If you download the CMU Pronouncing Dictionary
 
 | Rule | Detail |
 |---|---|
-| Day boundary | Midnight at UTC-12 = 12:00 UTC = 4am Pacific / 7am Eastern (5am / 8am in summer). Day #1 = Nov 11, 2026, same numbering as Caesarle. |
+| Day boundary | Midnight at UTC-12 = 12:00 UTC = 4am Pacific / 7am Eastern (5am / 8am in summer). Day #1 = Nov 12, 2026, same numbering as Caesarle. |
 | Future draws | A day's words can't be read before that day starts. |
 | Haiku shape | 3 lines, 5-7-5 syllables. |
 | Draw words | Each one can be used once. |

@@ -10,7 +10,7 @@
   const TEST = testParam === null ? TEST_MODE : testParam !== "0";
 
   // Day #1 of the site. Every game counts from here.
-  const LAUNCH = Date.UTC(2026, 10, 11); // months are 0-based: 10 = November
+  const LAUNCH = Date.UTC(2026, 10, 12); // months are 0-based: 10 = November
 
   // Today's puzzle number, based on the player's local calendar date
   // (same approach as Wordle: everyone gets puzzle N on their own "today").
@@ -19,7 +19,7 @@
     return Math.floor((local - LAUNCH) / 86400000) + 1;
   }
 
-  // "2026-11-11" <-> day 1
+  // "2026-11-12" <-> day 1
   function dayToDate(day) {
     return new Date(LAUNCH + (day - 1) * 86400000).toISOString().slice(0, 10);
   }
