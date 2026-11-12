@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>Caesarle · a daily cipher word game</title>
+  <meta name="description" content="Today's word is hidden behind a Caesar cipher. Probe it, crack the shift, then lock in your answer.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%230d1730%22/><text x=%2250%22 y=%2270%22 font-size=%2260%22 text-anchor=%22middle%22 fill=%22%23e3b448%22 font-family=%22Georgia%22>D</text></svg>">
+  <link rel="stylesheet" href="../shared/style.css">
+  <link rel="stylesheet" href="caesarle.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="../">Daily <span>·</span> Games</a>
+    <nav>
+      <button class="icon-btn" id="wheelBtn" aria-label="Cipher wheel" aria-controls="wheelPanel">◎</button>
+      <button class="icon-btn" id="helpBtn" aria-label="How to play">?</button>
+      <button class="icon-btn" id="statsBtn" aria-label="Statistics">▮▮</button>
+    </nav>
+  </header>
+
+  <div class="layout">
+  <aside class="wheel-panel" id="wheelPanel" aria-label="Cipher wheel"></aside>
+  <main class="game">
+    <h1 class="title">Caesarle <small id="dayLabel"></small></h1>
+
+    <section class="board" id="board" aria-live="polite" aria-label="Probe guesses"></section>
+
+    <section class="final" id="finalArea" aria-label="Final answer">
+      <div class="final-label">Final answer <span>· one shot, ends the game</span></div>
+      <div class="final-row" id="finalRow" tabindex="0" role="button" aria-label="Type your final answer"></div>
+      <button class="btn lock" id="lockBtn">Lock in</button>
+    </section>
+
+    <section class="keyboard" id="keyboard"></section>
+  </main>
+  </div>
+  <div class="scrim" id="scrim"></div>
+
+  <div class="modal" id="helpModal" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
+    <div class="card">
+      <button class="icon-btn close" data-close>✕</button>
+      <h2 id="helpTitle">How to play</h2>
+      <p>Today's secret word has been run through a <b>Caesar cipher</b>:
+        every letter pushed forward the same number of places (the <b>shift</b>,
+        1–25), wrapping Z back to A. With a shift of 1, <code>PASTE</code>
+        becomes <code>QBTUF</code>.</p>
+      <p><b>Probe rows</b> (up to 6). Each one is a 5-letter guess, plus an
+        <b>optional</b> shift guess. Leave the shift blank to skip the check.
+        Every guess is checked against the <b>encrypted</b> word:</p>
+      <ul class="legend">
+        <li><span class="tile hit">T</span> this letter is in the cipher, right spot</li>
+        <li><span class="tile near">B</span> in the cipher, wrong spot</li>
+        <li><span class="tile miss">M</span> not in the cipher</li>
+        <li><span class="badge done">7 ↑</span> the real shift is higher</li>
+        <li><span class="badge done">20 ↓</span> the real shift is lower</li>
+        <li><span class="badge exact">13 ✓</span> you've cracked the shift</li>
+      </ul>
+      <p>A probe can be a <b>real word</b> (<code>SLATE</code>) or a real word
+        <b>written in today's cipher</b> (<code>TMBUF</code>, if the shift is 1).
+        Cipher gibberish in the wrong shift is rejected, and so is anything else
+        that isn't a word. A rejected probe doesn't use a row, but it costs 5 points.</p>
+      <p><b>Final answer.</b> Tap the row under the board (or press <kbd>Tab</kbd>)
+        and type the real, decoded word. You only get one try, and it ends the game.</p>
+      <h3>Points</h3>
+      <table class="points">
+        <tr><td>Correct final answer</td><td>+100</td></tr>
+        <tr><td>🏛️ No probes (Veni, vidi, vici)</td><td>+60</td></tr>
+        <tr><td>1 probe</td><td>+30</td></tr>
+        <tr><td>2 probes</td><td>+20</td></tr>
+        <tr><td>3 probes</td><td>+10</td></tr>
+        <tr><td>4 probes</td><td>0</td></tr>
+        <tr><td>5 probes</td><td>−10</td></tr>
+        <tr><td>6 probes</td><td>−20</td></tr>
+        <tr><td>🔑 Cracked the key (hit the exact shift)</td><td>+25</td></tr>
+        <tr><td>🕶️ No shift checks (never entered a shift guess)</td><td>+50</td></tr>
+        <tr><td>📜 Speaks cipher (a probe accepted only in cipher)</td><td>+15</td></tr>
+        <tr><td>🙈 Ignored the signs (a shift guess the arrows already ruled out)</td><td>−10 each</td></tr>
+        <tr><td>🗡️ Et tu? (probed the real answer instead of locking it in)</td><td>−15</td></tr>
+        <tr><td>🚫 Barbarians at the gate (a probe rejected as not-a-word)</td><td>−5 each</td></tr>
+        <tr><td>💀 Wrong final answer (no bonuses; rejections still count)</td><td>−25</td></tr>
+      </table>
+      <p class="muted">The <b>◎ cipher wheel</b> on the left lets you line up the two
+        alphabets at any shift and test words. It's a scratchpad and doesn't know today's answer.</p>
+      <p class="muted">Think a word should (or shouldn't) be in the game?
+        <a href="../contact/?game=caesarle">Tell me</a>.</p>
+      <p class="muted">Keyboard: letters to type, digits for the shift,
+        <kbd>Enter</kbd> to probe (shift optional), <kbd>Tab</kbd> to switch to the final answer.</p>
+    </div>
+  </div>
+
+  <div class="modal" id="confirmModal" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
+    <div class="card">
+      <h2 id="confirmTitle">Lock in <span id="confirmWord"></span>?</h2>
+      <p>This is your only final answer. The game ends either way.</p>
+      <div class="actions">
+        <button class="btn" id="confirmYes">Lock it in</button>
+        <button class="btn secondary" data-close>Keep probing</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="statsModal" role="dialog" aria-modal="true" aria-labelledby="statsTitle">
+    <div class="card">
+      <button class="icon-btn close" data-close>✕</button>
+      <div id="endBlock" class="end-block"></div>
+      <h2 id="statsTitle">Statistics</h2>
+      <div id="statsBody"></div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="../shared/daily.js"></script>
+  <script src="../shared/wheel.js"></script>
+  <script src="words.js"></script>
+  <script src="caesarle.js"></script>
+</body>
+</html>

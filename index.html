@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Daily Games · Roman Serius</title>
+  <meta name="description" content="Small daily puzzles. One a day, same for everyone.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%230d1730%22/><text x=%2250%22 y=%2270%22 font-size=%2260%22 text-anchor=%22middle%22 fill=%22%23e3b448%22 font-family=%22Georgia%22>D</text></svg>">
+  <link rel="stylesheet" href="shared/style.css">
+  <style>
+    .hub { max-width: 720px; margin: 0 auto; padding: 28px 16px 48px; }
+    .hero h1 { font-family: var(--serif); font-size: 2.4rem; margin: 0; color: var(--gold); }
+    .hero h1 span { color: var(--red); }
+    .hero p { color: var(--muted); margin: 6px 0 0; }
+    .date { font-family: var(--mono); color: var(--ink); font-size: 0.9rem; margin-top: 14px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px; margin-top: 24px; }
+    .game-card {
+      display: flex; flex-direction: column; gap: 8px;
+      background: var(--panel); border: 1px solid var(--panel-2); border-radius: 14px;
+      padding: 16px; text-decoration: none; color: var(--ink); min-height: 170px;
+      transition: transform .12s, border-color .12s;
+    }
+    a.game-card:hover { transform: translateY(-2px); border-color: var(--gold); }
+    .game-card .glyph { font-family: var(--mono); font-size: 1.1rem; letter-spacing: .25em; color: var(--gold); }
+    .game-card h2 { font-family: var(--serif); margin: 0; font-size: 1.3rem; }
+    .game-card p { margin: 0; color: var(--muted); font-size: .9rem; flex: 1; }
+    .game-card .status { font-size: .78rem; font-family: var(--mono); }
+    .game-card .status.done { color: var(--hit); }
+    .game-card.soon { opacity: .55; border-style: dashed; }
+    footer { margin-top: 40px; color: var(--muted); font-size: .85rem; line-height: 1.9; }
+  </style>
+</head>
+<body>
+  <main class="hub">
+    <section class="hero">
+      <h1>Daily <span>·</span> Games</h1>
+      <p>Small puzzles. One a day, same for everyone.</p>
+      <div class="date" id="today"></div>
+    </section>
+
+    <section class="grid" id="games"></section>
+
+    <footer>
+      <a href="contact/">Suggest a word, a dilemma, or anything else</a><br>
+      Made by <a href="https://roman-serius.github.io">Roman Serius</a> ·
+      <a href="https://intothevoidpress.substack.com">Into the Void</a>
+    </footer>
+  </main>
+
+  <script src="shared/daily.js"></script>
+  <script src="shared/games.js"></script>
+  <script>
+    // Games are listed in shared/games.js.
+    const GAMES = window.GAMES;
+
+    const day = Daily.dayNumber();
+    document.getElementById("today").textContent =
+      `No. ${day} · ${new Date().toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric" })}`;
+
+    document.getElementById("games").innerHTML = GAMES.map((g) => {
+      if (g.status !== "live") {
+        return `<div class="game-card soon"><div class="glyph">${g.glyph}</div><h2>${g.name}</h2><p>${g.blurb}</p><div class="status">coming soon · <a href="contact/?game=${g.id}">send an idea</a></div></div>`;
+      }
+      const s = Daily.loadDay(g.id, day);
+      const done = s && s.status && s.status !== "playing";
+      const streak = Daily.stats(g.id).streak;
+      const label = done ? `✓ played today${streak ? ` · ${streak}🔥` : ""}` : "play today's →";
+      return `<a class="game-card" href="${g.id}/"><div class="glyph">${g.glyph}</div><h2>${g.name}</h2><p>${g.blurb}</p><div class="status${done ? " done" : ""}">${label}</div></a>`;
+    }).join("");
+  </script>
+</body>
+</html>

@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Contact · Daily Games</title>
+  <meta name="description" content="Suggest a word, a dilemma, or report a problem.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%230d1730%22/><text x=%2250%22 y=%2270%22 font-size=%2260%22 text-anchor=%22middle%22 fill=%22%23e3b448%22 font-family=%22Georgia%22>D</text></svg>">
+  <link rel="stylesheet" href="../shared/style.css">
+  <style>
+    .contact { max-width: 520px; margin: 0 auto; padding: 28px 16px 48px; }
+    .contact h1 { font-family: var(--serif); color: var(--gold); margin: 0 0 6px; font-size: 2rem; }
+    .contact .lead { color: var(--muted); margin: 0 0 24px; }
+    form { display: grid; gap: 18px; }
+    label { display: grid; gap: 6px; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); }
+    label small { text-transform: none; letter-spacing: 0; }
+    select, textarea, input[type=text] {
+      background: var(--panel); color: var(--ink); border: 1px solid var(--panel-2); border-radius: 10px;
+      padding: 12px 14px; font: 1rem var(--sans); width: 100%;
+    }
+    select:focus, textarea:focus, input[type=text]:focus { outline: none; border-color: var(--gold); }
+    select { appearance: none; background-image: linear-gradient(45deg, transparent 50%, var(--gold) 50%), linear-gradient(135deg, var(--gold) 50%, transparent 50%);
+      background-position: calc(100% - 20px) 50%, calc(100% - 14px) 50%; background-size: 6px 6px; background-repeat: no-repeat; padding-right: 40px; }
+    textarea { min-height: 140px; resize: vertical; line-height: 1.45; }
+    .count { text-align: right; font-family: var(--mono); font-size: 0.75rem; color: var(--muted); text-transform: none; letter-spacing: 0; }
+    .count.near { color: var(--gold); }
+    .hp { position: absolute; left: -9999px; }
+    .row-end { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+    .status { font-size: 0.9rem; color: var(--muted); }
+    .status.err { color: var(--red); }
+    .done { text-align: center; padding: 36px 16px; background: var(--panel); border: 1px solid var(--panel-2); border-radius: 14px; }
+    .done h2 { font-family: var(--serif); color: var(--gold); margin: 0 0 8px; }
+    .done p { color: var(--muted); }
+    .notice { background: #2a0f12; border: 1px solid var(--red); border-radius: 10px; padding: 10px 14px; font-size: 0.85rem; margin-bottom: 18px; }
+    .notice code { font-family: var(--mono); color: var(--gold); }
+    pre.preview { white-space: pre-wrap; font: 0.8rem var(--mono); background: var(--bg); padding: 10px; border-radius: 8px; text-align: left; color: var(--ink); }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="../">Daily <span>·</span> Games</a>
+  </header>
+
+  <main class="contact">
+    <h1>Get in touch</h1>
+    <p class="lead">Suggest a word, pitch a dilemma, report a bug, or just say hi.</p>
+
+    <div id="notice"></div>
+
+    <form id="form" novalidate>
+      <label>Which game?
+        <select name="game" id="game" required></select>
+      </label>
+
+      <label>Your message
+        <textarea name="message" id="message" maxlength="500" required></textarea>
+        <span class="count" id="count">0 / 500</span>
+      </label>
+
+      <label>Name or handle <small>(optional, if you'd like credit)</small>
+        <input type="text" name="name" id="name" maxlength="60" autocomplete="nickname">
+      </label>
+
+      <!-- spam trap: real people never see or tick this -->
+      <input type="checkbox" name="botcheck" class="hp" tabindex="-1" autocomplete="off">
+
+      <div class="row-end">
+        <button class="btn" type="submit" id="send">Send</button>
+        <span class="status" id="status" role="status"></span>
+      </div>
+    </form>
+
+    <div class="done" id="done" hidden>
+      <h2 id="doneTitle">Thanks!</h2>
+      <p id="doneText">Your message is on its way.</p>
+      <div id="donePreview"></div>
+      <p><a href="../">Back to the games</a> · <a href="" id="again">Send another</a></p>
+    </div>
+  </main>
+
+  <script src="../shared/daily.js"></script>
+  <script src="../shared/games.js"></script>
+  <script>
+    (function () {
+      const $ = (id) => document.getElementById(id);
+      const KEY = (window.SITE && window.SITE.contactKey) || "";
+      const HOOK = (window.SITE && window.SITE.discordWebhook) || "";
+      const READY = !!(KEY || HOOK);
+      const MAX = 500;
+
+      // Dropdown: every game, then general options
+      const options = [
+        ...window.GAMES.map((g) => ({ id: g.id, name: g.name, hint: g.suggest })),
+        { id: "site", name: "The site in general", hint: "Something about the site, a new game idea, or a problem…" },
+        { id: "other", name: "Something else", hint: "What's on your mind?" },
+      ];
+      $("game").innerHTML =
+        `<option value="" disabled selected>Choose one…</option>` +
+        options.map((o) => `<option value="${o.id}">${o.name}</option>`).join("");
+
+      // ?game=caesarle preselects a game (used by links from each game)
+      const pre = new URLSearchParams(location.search).get("game");
+      if (options.some((o) => o.id === pre)) $("game").value = pre;
+
+      function updateHint() {
+        const o = options.find((x) => x.id === $("game").value);
+        $("message").placeholder = o ? o.hint : "Pick a game first, or choose “Something else”.";
+      }
+      function updateCount() {
+        const n = $("message").value.length;
+        $("count").textContent = `${n} / ${MAX}`;
+        $("count").classList.toggle("near", n > MAX - 50);
+      }
+      $("game").addEventListener("change", updateHint);
+      $("message").addEventListener("input", updateCount);
+      updateHint();
+      updateCount();
+
+      if (!READY) {
+        $("notice").innerHTML = Daily.TEST
+          ? `<div class="notice"><b>Test mode:</b> the form isn't connected yet, so Send shows what would be sent instead. Add a Discord webhook (<code>discordWebhook</code>) or a Web3Forms key (<code>contactKey</code>) in <code>shared/games.js</code>.</div>`
+          : `<div class="notice">The contact form isn't set up yet. Please check back soon.</div>`;
+      }
+
+      function setStatus(msg, err) {
+        $("status").textContent = msg;
+        $("status").classList.toggle("err", !!err);
+      }
+
+      $("form").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const game = options.find((o) => o.id === $("game").value);
+        const message = $("message").value.trim();
+        if (!game) { $("game").focus(); return setStatus("Pick which game this is about.", true); }
+        if (message.length < 3) { $("message").focus(); return setStatus("Write a short message first.", true); }
+
+        const payload = {
+          access_key: KEY,
+          subject: `[Daily Games] ${game.name}`,
+          from_name: "Daily Games contact form",
+          game: game.name,
+          message,
+          name: $("name").value.trim() || "(not given)",
+          page: document.referrer || "(direct)",
+          botcheck: $("form").botcheck.checked,
+        };
+
+        if (!READY) {
+          if (!Daily.TEST) return setStatus("The contact form isn't set up yet.", true);
+          const { access_key, botcheck, ...shown } = payload;
+          $("doneTitle").textContent = "Preview";
+          $("doneText").textContent = "Test mode: nothing was sent. This is what you'd receive:";
+          showDone(`<pre class="preview">${escapeHtml(JSON.stringify(shown, null, 2))}</pre>`);
+          return;
+        }
+
+        if (payload.botcheck) return showDone(""); // a bot ticked the trap: pretend it worked, send nothing
+
+        $("send").disabled = true;
+        setStatus("Sending…");
+        const jobs = [];
+        if (HOOK) jobs.push(sendDiscord(payload));
+        if (KEY) jobs.push(sendEmail(payload));
+        const results = await Promise.allSettled(jobs);
+        $("send").disabled = false;
+        if (results.some((r) => r.status === "fulfilled")) showDone("");
+        else setStatus((results[0] && results[0].reason && results[0].reason.message) || "Something went wrong. Please try again.", true);
+      });
+
+      // Discord: posts an embed into the webhook's channel. Mentions are switched
+      // off so nobody can ping @everyone through the form.
+      async function sendDiscord(p) {
+        const res = await fetch(HOOK, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            username: "Daily Games",
+            allowed_mentions: { parse: [] },
+            embeds: [{
+              title: p.game,
+              description: p.message.slice(0, 2000),
+              color: 0xe3b448,
+              fields: [
+                { name: "From", value: p.name.slice(0, 100), inline: true },
+                { name: "Sent from", value: p.page.slice(0, 200), inline: true },
+              ],
+              timestamp: new Date().toISOString(),
+            }],
+          }),
+        }).catch(() => { throw new Error("Couldn't reach the server. Check your connection and try again."); });
+        if (!res.ok) throw new Error(res.status === 429 ? "Too many messages right now. Try again in a minute." : "Something went wrong. Please try again.");
+      }
+
+      // Email via Web3Forms
+      async function sendEmail(p) {
+        const res = await fetch("https://api.web3forms.com/submit", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Accept: "application/json" },
+          body: JSON.stringify(p),
+        }).catch(() => { throw new Error("Couldn't reach the server. Check your connection and try again."); });
+        const json = await res.json().catch(() => ({}));
+        if (res.status !== 200) throw new Error(json.message || "Something went wrong. Please try again.");
+      }
+
+      function showDone(extra) {
+        $("form").hidden = true;
+        $("done").hidden = false;
+        $("donePreview").innerHTML = extra;
+      }
+      $("again").addEventListener("click", (e) => {
+        e.preventDefault();
+        $("message").value = "";
+        updateCount();
+        setStatus("");
+        $("done").hidden = true;
+        $("form").hidden = false;
+        $("message").focus();
+      });
+
+      function escapeHtml(s) {
+        return s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+      }
+    })();
+  </script>
+</body>
+</html>
