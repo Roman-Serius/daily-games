@@ -5,3 +5,6 @@ haikudle/tools/.draw-seed
 haikudle/tools/out/
 haikudle/tools/schedule.csv
 haikudle/tools/.supabase-db-url
+
+# Where's Waddle: work in progress, not published yet (remove this line to publish)
+wheres waddle/

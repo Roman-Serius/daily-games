@@ -244,3 +244,6 @@ kbd {
 /* About text under the game (also read by search engines) */
 .about { max-width: 640px; margin: 40px auto 24px; padding: 0 16px; color: var(--muted); font-size: 0.9rem; line-height: 1.55; }
 .about h2 { font-family: var(--serif); color: var(--ink); font-size: 1.1rem; margin: 0 0 6px; }
+
+/* Colour-blind mode: a loss shouldn't read as orange-ish like a win */
+html.cb .final-row.lost .tile { background: var(--miss); border-color: var(--red); }

@@ -154,7 +154,20 @@
     return `${pad(Math.floor(s / 3600))}:${pad(Math.floor((s % 3600) / 60))}:${pad(s % 60)}`;
   }
 
+  // ---- colour-blind mode (site-wide, remembered per browser) ----
+  // Adds the "cb" class to <html>; shared/style.css swaps the colours and adds
+  // shape marks. Games read Daily.colorBlind() for things like share emoji.
+  function colorBlind() {
+    return !!load("dg:colorblind", false);
+  }
+  function setColorBlind(on) {
+    save("dg:colorblind", !!on);
+    document.documentElement.classList.toggle("cb", !!on);
+  }
+  document.documentElement.classList.toggle("cb", colorBlind());
+
   window.Daily = {
+    colorBlind, setColorBlind,
     TEST,
     dayNumber, dayToDate, dateToDay, currentDay, isArchiveDay, rng, shuffle, pick,
     load, save, loadDay, saveDay, stats, recordResult, share, countdown,

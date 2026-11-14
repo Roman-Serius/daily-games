@@ -352,11 +352,18 @@
     m.addEventListener("click", (e) => { if (e.target === m || e.target.closest("[data-close]")) closeModals(); })
   );
   $("helpBtn").addEventListener("click", () => $("helpModal").classList.add("open"));
+  // Guarded so a briefly cached older page or daily.js can't break the game
+  if ($("cbMode") && Daily.setColorBlind) {
+    $("cbMode").checked = Daily.colorBlind();
+    $("cbMode").addEventListener("change", (e) => Daily.setColorBlind(e.target.checked));
+  }
   $("statsBtn").addEventListener("click", openStats);
 
   function shareText() {
     const { total, items } = points();
-    const emoji = { hit: "🟩", near: "🟨", miss: "⬛" };
+    const emoji = Daily.colorBlind && Daily.colorBlind()
+      ? { hit: "🟧", near: "🟦", miss: "⬛" }
+      : { hit: "🟩", near: "🟨", miss: "⬛" };
     const arr = { exact: "✅", up: "⬆️", down: "⬇️", none: "▪️" };
     const rows = state.probes.map((p) => colors(p.word).map((c) => emoji[c]).join("") + " " + arr[arrow(p.shift)]);
     const badges = items.map(([l]) => l.match(/^\p{Extended_Pictographic}/u)?.[0]).filter(Boolean).join("");

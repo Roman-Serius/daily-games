@@ -13,9 +13,9 @@ window.GAMES = [
     suggest: "A word you'd love to see in the draw, a bug, an idea…",
   },
   {
-    id: "trolley", name: "The Daily Trolley", glyph: "─┬─", status: "soon",
-    blurb: "One dilemma a day. Choose, then see how everyone else chose.",
-    suggest: "Describe your dilemma and the two or three options people would choose between…",
+    id: "wheres-waddle", name: "Where's Waddle?", glyph: "▶◀", status: "soon",
+    blurb: "A new crowded scene every day. Find Waddle, the only penguin in a bowtie.",
+    suggest: "A scene, a prop or a kind of penguin you'd like to see, or a hiding spot idea…",
   },
 ];
 

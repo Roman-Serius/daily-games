@@ -177,3 +177,56 @@ a { color: var(--gold); }
 .wheel-out code { font-family: var(--mono); color: var(--gold); letter-spacing: 0.12em; font-size: 1rem; }
 .wheel-use { width: 100%; }
 .wheel-hint { color: var(--muted); font-size: 0.75rem; margin: 0; text-align: center; }
+
+/* ---------- Colour-blind mode (html.cb, toggled by Daily.setColorBlind) ----------
+   Orange / blue instead of green / yellow, which most colour vision types can
+   tell apart, plus shape marks so tiles never rely on colour alone:
+   right spot = solid bar along the bottom, wrong spot = dot in the corner. */
+html.cb {
+  --hit: #f5793a;
+  --near: #3d8fd6;
+}
+html.cb .tile.hit,
+html.cb .tile.near,
+html.cb .key.hit,
+html.cb .key.near { position: relative; }
+html.cb .tile.hit::after,
+html.cb .key.hit::after {
+  content: "";
+  position: absolute;
+  left: 18%; right: 18%; bottom: 12%;
+  height: 4px;
+  border-radius: 2px;
+  background: currentColor;
+  opacity: 0.9;
+}
+html.cb .tile.near::after,
+html.cb .key.near::after {
+  content: "";
+  position: absolute;
+  top: 10%; right: 10%;
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.9;
+}
+
+/* Settings switch, reusable on any page */
+.setting {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 10px 12px;
+  margin: 12px 0;
+  background: var(--panel-2);
+  border-radius: 10px;
+  font-size: 0.92rem;
+  cursor: pointer;
+}
+.setting small { display: block; color: var(--muted); font-size: 0.78rem; margin-top: 2px; }
+.setting input { appearance: none; flex: none; width: 42px; height: 24px; border-radius: 999px; background: var(--miss); position: relative; cursor: pointer; transition: background .15s; }
+.setting input::after { content: ""; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: var(--ink); transition: transform .15s; }
+.setting input:checked { background: var(--gold); }
+.setting input:checked::after { transform: translateX(18px); }
+.setting input:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
