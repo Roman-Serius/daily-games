@@ -1,0 +1,205 @@
+/* Rooted. Palette comes from ../shared/style.css */
+:root {
+  --rel: var(--near);
+  --hubc: #8d97b5;
+}
+
+.game {
+  width: 100%;
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 10px 14px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-height: calc(100dvh - 58px);
+}
+.title {
+  font-family: var(--serif);
+  font-weight: 600;
+  margin: 4px 0 0;
+  font-size: 1.6rem;
+  letter-spacing: 0.03em;
+  text-align: center;
+}
+.title small { color: var(--muted); font-size: 0.9rem; font-family: var(--mono); }
+.beta-note { margin: -6px auto 12px; max-width: 36em; text-align: center; color: var(--muted); font-size: 0.78rem; line-height: 1.5; }
+.beta-note b { color: var(--gold); font-family: var(--mono); font-weight: normal; letter-spacing: 0.1em; text-transform: uppercase; }
+
+.score { color: var(--muted); font-family: var(--mono); font-size: 0.85rem; text-align: center; margin-top: -6px; }
+.score b { color: var(--ink); }
+
+/* ---------- the two root systems ---------- */
+.trees { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; align-items: start; padding-bottom: 6px; }
+.tree { min-width: 0; display: flex; flex-direction: column; }
+.tree.right { align-items: flex-end; text-align: right; }
+.tree-head { color: var(--muted); font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.16em; margin: 0 4px 4px; }
+.node { display: flex; flex-direction: column; align-items: flex-start; min-width: 0; max-width: 100%; }
+.tree.right .node { align-items: flex-end; }
+
+/* children hang off a root line */
+.kids { display: flex; flex-direction: column; margin-left: 6px; max-width: calc(100% - 6px); }
+.kids > .node { position: relative; padding: 26px 0 2px 24px; }
+/* the root line: each branch draws its own piece, the last one stops at its tick */
+.tree.right .kids { margin-left: 0; margin-right: 6px; align-items: flex-end; }
+.tree.right .kids > .node { padding: 26px 24px 2px 0; }
+
+.link { display: flex; align-items: center; gap: 4px; font-size: 0.72rem; color: var(--muted); margin: 0 4px 2px; min-width: 0; }
+.link .sq { width: 10px; height: 10px; margin: 0; flex: none; }
+.link b { color: var(--ink); font-family: var(--mono); }
+.link .mean { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-left: 3px; }
+.tree.right .link { flex-direction: row-reverse; }
+
+.word { display: flex; flex-wrap: wrap; align-items: stretch; gap: 2px; padding: 4px; border-radius: 10px; border: 1px solid transparent; max-width: 100%; }
+.tree.right .word { justify-content: flex-end; }
+.word.seed { background: var(--panel); border-color: var(--panel-2); }
+.word.current { background: var(--panel); border-color: var(--gold); }
+.word.onpath { border-color: var(--gold); background: var(--panel); }
+.trees.done .word:not(.onpath) { opacity: 0.55; }
+
+.chip, .glue { font: 700 1rem var(--mono); letter-spacing: 0.03em; padding: 5px 5px; border-radius: 6px; line-height: 1; }
+.word.seed .chip, .word.seed .glue { font-size: 1.1rem; }
+.glue { color: var(--muted); padding-left: 1px; padding-right: 1px; font-weight: 500; }
+.chip { background: var(--panel-2); color: var(--ink); border: 1px solid transparent; cursor: pointer; }
+.chip.hubpart { background: transparent; border: 1px dashed var(--panel-2); color: var(--muted); }
+.chip:hover { border-color: var(--gold); }
+.chip.sel { background: var(--gold); color: var(--bg); border-color: var(--gold); }
+.chip.spent { opacity: 0.35; text-decoration: line-through; cursor: not-allowed; }
+.chip:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.trees.done .chip { cursor: default; }
+.trees.done .chip:hover { border-color: transparent; }
+.chip.demo { font-size: 0.9rem; padding: 2px 5px; cursor: default; }
+.demo-word { font-family: var(--mono); }
+
+/* where the roots meet */
+.bridge { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.bridge:empty { display: none; }
+.meet { display: inline-flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 8px;
+  background: var(--panel); border: 1px solid var(--gold); border-radius: 999px; padding: 7px 16px; font-size: 0.92rem; }
+.meet b { font-family: var(--mono); color: var(--gold); }
+.meet .joint { color: var(--muted); font-family: var(--mono); }
+.meet .sq { margin: 0; }
+.meet-note { color: var(--muted); font-size: 0.8rem; }
+
+@media (max-width: 420px) {
+  .chip, .glue { font-size: 0.9rem; padding: 4px 4px; }
+  .word.seed .chip, .word.seed .glue { font-size: 1rem; }
+  .link .mean { display: none; }
+}
+
+/* ---------- dock (sticky input) ---------- */
+.dock {
+  position: sticky;
+  bottom: 0;
+  margin: auto -14px 0;
+  padding: 10px 14px calc(10px + env(safe-area-inset-bottom));
+  background: linear-gradient(to bottom, rgba(13, 23, 48, 0.85), var(--bg) 30%);
+  border-top: 1px solid var(--panel-2);
+  display: grid;
+  gap: 8px;
+}
+.part-info { font-size: 0.9rem; color: var(--muted); min-height: 1.3em; }
+.part-info b { color: var(--gold); font-family: var(--mono); }
+.part-info .kind { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em; margin-left: 4px; }
+.move { display: flex; gap: 8px; }
+.move input {
+  flex: 1;
+  min-width: 0;
+  background: var(--panel);
+  color: var(--ink);
+  border: 1px solid var(--panel-2);
+  border-radius: 8px;
+  padding: 10px 12px;
+  font: 600 1.05rem var(--mono);
+  letter-spacing: 0.04em;
+}
+.move input:focus { outline: none; border-color: var(--gold); }
+.move input:disabled { opacity: 0.55; }
+.move .btn:disabled { opacity: 0.4; cursor: default; }
+.dock-foot { display: flex; justify-content: space-between; align-items: center; }
+.link-btn { background: none; border: 0; color: var(--muted); font-size: 0.85rem; text-decoration: underline; cursor: pointer; padding: 2px 0; }
+.dock.over .move, .dock.over .part-info { display: none; }
+
+.shake { animation: shake 0.35s; }
+@keyframes shake { 20%, 60% { transform: translateX(-5px); } 40%, 80% { transform: translateX(5px); } }
+
+/* ---------- legend squares ---------- */
+.sq { display: inline-block; width: 14px; height: 14px; border-radius: 3px; vertical-align: -2px; margin-right: 6px; }
+.sq.root { background: var(--hit); }
+.sq.rel { background: var(--rel); }
+.sq.hub { background: transparent; border: 2px dashed var(--hubc); }
+.legend { list-style: none; padding: 0; display: grid; gap: 8px; }
+.steps { padding-left: 20px; display: grid; gap: 6px; }
+.modal h3 { font-family: var(--serif); color: var(--gold); margin: 14px 0 6px; font-size: 1.05rem; }
+.muted { color: var(--muted); font-size: 0.88rem; }
+.actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
+
+/* ---------- end of game ---------- */
+.end-block h2 { margin-bottom: 4px; }
+.end-block .verdict { font-family: var(--mono); color: var(--muted); margin: 0 0 10px; }
+.end-block .grid { font-size: 1.3rem; letter-spacing: 1px; margin: 6px 0 10px; }
+.end-block .sol { background: var(--bg); border-radius: 10px; padding: 10px 12px; font-size: 0.9rem; margin: 10px 0; }
+.end-block .sol div { margin: 3px 0; }
+.end-block .sol b { font-family: var(--mono); color: var(--gold); }
+.end-block .next { color: var(--muted); font-size: 0.85rem; }
+.end-block { border-bottom: 1px solid var(--panel-2); padding-bottom: 12px; margin-bottom: 12px; }
+.end-block:empty { display: none; }
+
+.about { max-width: 760px; margin: 0 auto; padding: 18px 14px 28px; color: var(--muted); font-size: 0.85rem; text-align: center; }
+
+/* Messages sit just above the input, where your eyes are */
+.toast { top: auto; bottom: calc(150px + env(safe-area-inset-bottom)); max-width: calc(100vw - 32px); text-align: center; }
+
+/* ---------- endless testing mode ---------- */
+.endless-bar { background: var(--panel); border: 1px solid var(--gold); border-radius: 12px; padding: 10px 12px; }
+.endless-bar[hidden] { display: none; }
+.eb-row { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px; }
+.eb-btns { display: flex; gap: 8px; }
+.eb-btns .btn { padding: 7px 14px; font-size: 0.9rem; }
+.endless-bar .sol { background: var(--bg); border-radius: 10px; padding: 8px 10px; font-size: 0.85rem; margin-top: 8px; }
+.endless-bar .sol div { margin: 2px 0; }
+.endless-bar .sol b { font-family: var(--mono); color: var(--gold); }
+
+/* ---------- points (same look as Caesarle) ---------- */
+.end-block .score { font-family: var(--serif); font-size: 2.6rem; color: var(--gold); line-height: 1; margin: 4px 0; }
+.end-block .score small { font-size: 1rem; color: var(--muted); font-family: var(--sans); }
+.points { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+.points td { padding: 4px 0; border-bottom: 1px solid var(--panel-2); vertical-align: top; }
+.points td:last-child { text-align: right; font-family: var(--mono); white-space: nowrap; padding-left: 10px; }
+.end-block .points { margin: 12px 0 4px; text-align: left; }
+.stat-row > div { min-width: 0; }
+
+/* ---------- root art (drawn by drawRoots in rooted.js) ---------- */
+:root { --bark: #5b4528; --bark-hi: #9a7745; }
+.trees { position: relative; }
+.trees > .tree { position: relative; z-index: 1; }
+.roots { position: absolute; left: 0; top: 0; z-index: 0; overflow: visible; pointer-events: none; }
+.roots path { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.roots .root-shade { stroke: #120c06; opacity: 0.55; }
+.roots .root { stroke: var(--bark-hi); }
+.roots .rootlet { stroke: var(--bark); opacity: 0.9; }
+.roots .root.on { stroke: var(--gold); }
+.roots .root-shade.on { stroke: #3a2a0c; opacity: 0.8; }
+.roots .root.meet { filter: drop-shadow(0 0 4px rgba(227, 180, 72, 0.6)); }
+/* a fresh root grows down from its parent */
+.roots .grow { stroke-dasharray: 1; stroke-dashoffset: 1; animation: rootgrow 0.7s ease-out forwards; }
+.roots .rootlet.grow { stroke-dasharray: none; opacity: 0; animation: rootletin 0.4s 0.5s ease-out forwards; }
+@keyframes rootgrow { to { stroke-dashoffset: 0; } }
+@keyframes rootletin { to { opacity: 0.9; } }
+.trees.done .roots .root:not(.on) { opacity: 0.45; }
+.roots-px { position: absolute; left: 0; top: 0; z-index: 0; pointer-events: none; image-rendering: pixelated; }
+.roots .root.px { stroke: #d9a066; }
+.roots .root-shade.px { stroke: #663931; opacity: 1; }
+.roots .root.meet.px { filter: none; }
+/* the backdrop roots run below the board: keep later content above them, and clip
+   them at the bottom of the game without making the page scroll further */
+.game { overflow: clip; }
+.bridge, .about { position: relative; z-index: 1; }
+.roots-bg { position: absolute; left: 0; top: 0; z-index: 0; pointer-events: none; image-rendering: pixelated; transition: opacity 0.6s; }
+/* room above each word for its root to grow down into */
+@media (max-width: 420px) {
+  .kids > .node { padding-top: 20px; }
+  .tree.right .kids > .node { padding-top: 20px; }
+}
+/* leave room between the words and the banner for the tangle that joins the two sides */
+.bridge:not(:empty) { margin-top: 40px; }

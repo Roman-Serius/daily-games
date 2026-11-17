@@ -1,0 +1,1 @@
+# Words the Wiktionary import should leave out (one per line, # for comments)

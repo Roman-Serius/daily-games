@@ -1,5 +1,6 @@
 // The list of games, used by the hub page and the contact form.
 // status: "live" links to the game's folder; "soon" shows a teaser card.
+// beta: true adds a "beta" tag to a live game's card.
 // suggest: the hint shown in the contact form when this game is picked.
 window.GAMES = [
   {
@@ -11,6 +12,11 @@ window.GAMES = [
     id: "haikudle", name: "Haikudle", glyph: "5·7·5", status: "live",
     blurb: "Eighteen word magnets, one haiku. Post yours, then like everyone else's.",
     suggest: "A word you'd love to see in the draw, a bug, an idea…",
+  },
+  {
+    id: "rooted", name: "Rooted", glyph: "√ROOT", status: "live", beta: true,
+    blurb: "Get from one word to another by traveling through the Latin and Greek roots they share.",
+    suggest: "A real word that got rejected, a root that's missing, a puzzle pair, a bug, an idea…",
   },
   {
     id: "wheres-waddle", name: "Where's Waddle?", glyph: "▶◀", status: "soon",

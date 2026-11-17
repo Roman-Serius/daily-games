@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>Rooted: the daily word-root journey</title>
+  <meta name="description" content="Rooted is a free daily word game. Travel from one English word to another through the roots they share: Latin, Greek and Old English.">
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#0d1730">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%230d1730%22/><text x=%2250%22 y=%2270%22 font-size=%2260%22 text-anchor=%22middle%22 fill=%22%23e3b448%22 font-family=%22Georgia%22>R</text></svg>">
+  <link rel="stylesheet" href="../shared/style.css">
+  <link rel="stylesheet" href="rooted.css?v=23">
+</head>
+<body>
+  <header class="topbar has-tools">
+    <a class="brand" href="/">Roman <span>·</span> Serius</a>
+    <nav class="site-nav" aria-label="Site">
+      <a href="/games/">Games</a>
+      <a href="/daily-games/" aria-current="page">Daily</a>
+      <a href="https://intothevoidpress.substack.com">Writing</a>
+      <a href="/about/">About</a>
+    </nav>
+    <nav>
+      <button class="icon-btn" id="helpBtn" aria-label="How to play">?</button>
+      <button class="icon-btn" id="statsBtn" aria-label="Statistics">▮▮</button>
+    </nav>
+  </header>
+
+  <main class="game">
+    <h1 class="title">Rooted <small id="dayLabel"></small></h1>
+    <p class="beta-note"><b>Beta</b> · The dictionary is still growing. When a real word gets rejected, it's logged anonymously so it can be added.</p>
+
+    <div class="score" id="score"></div>
+
+    <section class="trees" id="trees" aria-live="polite">
+      <canvas class="roots-bg" id="rootsBg" aria-hidden="true"></canvas>
+      <canvas class="roots-px" id="rootsPx" aria-hidden="true"></canvas>
+      <svg class="roots" id="roots" aria-hidden="true"></svg>
+      <div class="tree left" id="treeL" aria-label="Roots growing from the first word"></div>
+      <div class="tree right" id="treeR" aria-label="Roots growing from the second word"></div>
+    </section>
+    <div class="bridge" id="bridge"></div>
+
+    <section class="dock" id="dock">
+      <div class="part-info" id="partInfo"></div>
+      <form class="move" id="moveForm" autocomplete="off">
+        <input id="moveInput" type="text" inputmode="text" autocapitalize="none" autocorrect="off" spellcheck="false" placeholder="Tap a part first" disabled>
+        <button class="btn" id="goBtn" disabled>Go</button>
+      </form>
+      <div class="endless-bar" id="endlessBar" hidden></div>
+      <div class="dock-foot">
+        <button class="link-btn" id="giveUpBtn" type="button">Give up</button>
+      </div>
+    </section>
+  </main>
+
+  <div class="modal" id="helpModal" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
+    <div class="card">
+      <button class="icon-btn close" data-close>✕</button>
+      <h2 id="helpTitle">How to play</h2>
+      <p>Connect two words by growing <b>roots</b> from both ends until they meet.</p>
+      <ol class="steps">
+        <li><b>Tap a part</b> of a word on either side, like <span class="chip demo">norm</span> in
+          <span class="demo-word">ab·norm·al</span>.</li>
+        <li><b>Type any word</b> with that same part: <i>enormous</i>. It sprouts underneath.</li>
+        <li>Keep growing from either side. When a word you type is <b>already on the other side</b>,
+          the roots meet and you win.</li>
+      </ol>
+      <h3>Kinds of links</h3>
+      <ul class="legend">
+        <li><span class="sq root"></span><b>Root</b>: the same root. <i>norm</i> → <i>norm</i></li>
+        <li><span class="sq rel"></span><b>Relative</b>: a historically related root, like Latin
+          <i>ped</i> and Greek <i>pod</i> (both "foot"), or <i>ex-</i> and <i>extra-</i>.</li>
+        <li><span class="sq hub"></span><b>Prefix or suffix</b>: <i>ex-</i>, <i>re-</i>, <i>-al</i>…
+          Each one works <b>once</b> per puzzle.</li>
+      </ul>
+      <p>Watch for <b>false friends</b>: the <i>ped</i> in <i>encyclopedia</i> means "child,"
+        not "foot," and <i>terrify</i> has nothing to do with <i>terra</i>.</p>
+      <p>Every word you add stays on the board, so you can branch from any of them.</p>
+      <p><b>Par</b> is the shortest chain using roots alone. Prefixes and suffixes are allowed and can get
+        you <b>under par</b>, but they cost points.</p>
+      <h3>Points</h3>
+      <p class="muted">Your <b>chain</b> is the words that actually connect the two sides. Words left on
+        dead-end branches are <b>extra</b>: exploring is cheap, a short chain is what counts.</p>
+      <table class="points">
+        <tr><td>Connect the two words</td><td>+100</td></tr>
+        <tr><td>Each link in your chain</td><td>−10</td></tr>
+        <tr><td>Each prefix or suffix link in your chain (⬜)</td><td>−15 more</td></tr>
+        <tr><td>Each extra word</td><td>−5</td></tr>
+        <tr><td>🌳 Pure roots: no prefix or suffix links in your chain</td><td>+60</td></tr>
+      </table>
+      <p class="muted">Par is the shortest chain using roots alone, so the most you can score is a pure chain at par with no extra words: 120 on a par-4 puzzle, 130 on par 3. A pure-roots chain beats any shortcut, even a few links over par.</p>
+      <label class="setting">
+        <span>Colour-blind mode
+          <small>Orange and blue instead of green and yellow.</small></span>
+        <input type="checkbox" id="cbMode" role="switch">
+      </label>
+      <p class="muted">Rooted's word list is hand-made and still small. Missing a word you
+        know? <a href="../contact/?game=rooted">Tell me</a>.</p>
+    </div>
+  </div>
+
+  <div class="modal" id="statsModal" role="dialog" aria-modal="true" aria-labelledby="statsTitle">
+    <div class="card">
+      <button class="icon-btn close" data-close>✕</button>
+      <div id="endBlock" class="end-block"></div>
+      <h2 id="statsTitle">Statistics</h2>
+      <div id="statsBody"></div>
+    </div>
+  </div>
+
+  <div class="modal" id="confirmModal" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
+    <div class="card">
+      <h2 id="confirmTitle">Give up?</h2>
+      <p>You'll see a shortest path, and today counts as a loss.</p>
+      <div class="actions">
+        <button class="btn" id="confirmYes">Show me</button>
+        <button class="btn secondary" data-close>Keep digging</button>
+      </div>
+    </div>
+  </div>
+
+  <footer class="about">
+    <p><a href="../">More daily games</a> · <a href="../contact/?game=rooted">Suggest a word</a> · Made by <a href="https://romanserius.com/">Roman Serius</a></p>
+    <p>Many word histories come from <a href="https://en.wiktionary.org/">Wiktionary</a> (<a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>), via <a href="https://kaikki.org/">kaikki.org</a>.</p>
+  </footer>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="../shared/daily.js"></script>
+  <script src="../shared/games.js"></script>
+  <script src="../shared/analytics.js"></script>
+  <script src="words.js?v=23"></script>
+  <script src="words_wiki.js?v=23"></script>
+  <script src="puzzles.js?v=23"></script>
+  <script src="core.js?v=23"></script>
+  <script src="rooted.js?v=23"></script>
+</body>
+</html>

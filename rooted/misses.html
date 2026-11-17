@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Rooted: rejected guesses</title>
+  <meta name="robots" content="noindex">
+  <link rel="stylesheet" href="../shared/style.css">
+  <style>
+    main { max-width: 900px; margin: 0 auto; padding: 18px 14px 40px; }
+    h1 { font-family: var(--serif); color: var(--gold); margin: 0 0 4px; }
+    .muted { color: var(--muted); font-size: 0.88rem; }
+    .bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 14px 0; }
+    .bar label { color: var(--muted); font-size: 0.85rem; display: flex; gap: 6px; align-items: center; }
+    select, input[type=search] { background: var(--panel); color: var(--ink); border: 1px solid var(--panel-2); border-radius: 8px; padding: 7px 9px; font: inherit; }
+    h2 { font-family: var(--serif); color: var(--gold); font-size: 1.1rem; margin: 22px 0 8px; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+    th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--panel-2); vertical-align: top; }
+    th { color: var(--muted); font-weight: 600; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; }
+    td.w { font-family: var(--mono); font-weight: 700; }
+    .tag { font-size: 0.72rem; padding: 2px 7px; border-radius: 999px; background: var(--panel-2); white-space: nowrap; }
+    .tag.unknown { background: var(--red); color: var(--ink); }
+    .tag.false-friend { background: var(--near); color: var(--bg); }
+    .empty { color: var(--muted); padding: 20px 0; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Rooted: rejected guesses</h1>
+    <p class="muted" id="source"></p>
+    <p class="muted">Every guess Rooted turned down. Words marked <span class="tag unknown">unknown</span>
+      are missing from the word list and are the ones to add. Players' misses on the live site show up in GoatCounter
+      as events named <code>rooted/miss/…</code>.</p>
+
+    <div class="bar">
+      <label>Show <select id="reason">
+        <option value="">All rejections</option>
+        <option value="unknown">Missing words only</option>
+        <option value="false-friend">False friends</option>
+        <option value="no-share">No shared part</option>
+        <option value="hub-used">Prefix/suffix already used</option>
+        <option value="same-side">Already on that side</option>
+      </select></label>
+      <label><input type="checkbox" id="hideTest"> Hide test-mode guesses</label>
+      <a href="./?endless=1">Play endless testing →</a>
+      <input type="search" id="q" placeholder="Filter…">
+      <button class="btn secondary" id="copyBtn">Copy as CSV</button>
+      <button class="btn secondary" id="clearBtn">Clear list</button>
+    </div>
+
+    <p class="muted" id="count"></p>
+    <h2>By word</h2>
+    <div id="summary"></div>
+    <h2>Every guess</h2>
+    <div id="log"></div>
+  </main>
+  <div class="toast" id="toast"></div>
+
+  <script src="../shared/daily.js"></script>
+  <script>
+    const KEY = "dg:rooted:misses";
+    let ALL = Daily.load(KEY, []), FROM_FILE = false;
+    const $ = (id) => document.getElementById(id);
+    const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+    function rows() {
+      const reason = $("reason").value, q = $("q").value.trim().toLowerCase(), hideTest = $("hideTest").checked;
+      return ALL.filter((r) => (!reason || r.reason === reason) && (!hideTest || !r.test) &&
+        (!q || [r.word, r.typed, r.from, r.part, r.puzzle].join(" ").toLowerCase().includes(q)));
+    }
+    function render() {
+      const list = rows();
+      const total = ALL.length;
+      $("count").textContent = `${total} rejected guess${total === 1 ? "" : "es"} ${FROM_FILE ? "in the file" : "saved in this browser"}` +
+        (list.length < total ? ` · ${total - list.length} hidden by the filter` : "") + ".";
+      if (!list.length) {
+        $("summary").innerHTML = $("log").innerHTML = `<p class="empty">Nothing here yet.</p>`;
+        return;
+      }
+      const by = new Map();
+      for (const r of list) {
+        const k = r.word;
+        if (!by.has(k)) by.set(k, { n: 0, reasons: new Set(), via: new Set() });
+        const e = by.get(k); e.n++; e.reasons.add(r.reason); e.via.add(`${r.part} (from ${r.from})`);
+      }
+      const sorted = [...by].sort((a, b) => b[1].n - a[1].n || a[0].localeCompare(b[0]));
+      $("summary").innerHTML = `<table><tr><th>Word</th><th>Times</th><th>Reason</th><th>Tried through</th></tr>${sorted.map(([w, e]) =>
+        `<tr><td class="w">${esc(w)}</td><td>${e.n}</td><td>${[...e.reasons].map((x) => `<span class="tag ${x}">${x}</span>`).join(" ")}</td><td>${esc([...e.via].join(", "))}</td></tr>`).join("")}</table>`;
+      $("log").innerHTML = `<table><tr><th>When</th><th>Typed</th><th>Part</th><th>From</th><th>Puzzle</th><th>Reason</th></tr>${list.slice().reverse().map((r) =>
+        `<tr><td>${esc(new Date(r.t).toLocaleString())}${r.test ? " · test" : ""}</td><td class="w">${esc(r.typed)}${r.typed !== r.word ? ` → ${esc(r.word)}` : ""}</td><td>${esc(r.part)}</td><td>${esc(r.from)}</td><td>#${r.day} ${esc(r.puzzle.replace(">", " ⟷ "))}</td><td><span class="tag ${r.reason}">${r.reason}</span></td></tr>`).join("")}</table>`;
+    }
+    function toast(msg) { const t = $("toast"); t.textContent = msg; t.classList.add("show"); setTimeout(() => t.classList.remove("show"), 1800); }
+    $("copyBtn").addEventListener("click", async () => {
+      const cols = ["t", "day", "puzzle", "from", "part", "typed", "word", "reason", "test"];
+      const csv = [cols.join(","), ...rows().map((r) => cols.map((c) => `"${String(r[c] ?? "").replace(/"/g, '""')}"`).join(","))].join("\n");
+      try { await navigator.clipboard.writeText(csv); toast("Copied"); } catch (e) { toast("Couldn't copy"); }
+    });
+    $("clearBtn").addEventListener("click", () => {
+      if (FROM_FILE) { toast("To clear the file, delete rooted/tools/data/misses.jsonl"); return; }
+      if (!confirm("Clear every rejected guess saved in this browser?")) return;
+      Daily.save(KEY, []); ALL = []; render();
+    });
+    ["reason", "q", "hideTest"].forEach((id) => $(id).addEventListener("input", render));
+    // With tools/serve.py running, read the shared file instead of this browser's copy.
+    fetch("/__rooted/misses").then((r) => (r.ok ? r.json() : Promise.reject())).then((rows) => {
+      ALL = rows; FROM_FILE = true;
+      $("source").innerHTML = "Reading <code>rooted/tools/data/misses.jsonl</code> (every guess logged while tools/serve.py was running).";
+      render();
+    }).catch(() => {
+      $("source").innerHTML = "Showing this browser's list. Run <code>python3 rooted/tools/serve.py</code> to log every guess to a file.";
+    });
+    render();
+  </script>
+</body>
+</html>

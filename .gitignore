@@ -8,3 +8,8 @@ haikudle/tools/.supabase-db-url
 
 # Where's Waddle: work in progress, not published yet (remove this line to publish)
 wheres waddle/
+
+# Rooted: Wiktionary dump and import scratch (too big for GitHub)
+rooted/tools/data/
+rooted/**/*.aseprite
+__pycache__/
