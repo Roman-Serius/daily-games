@@ -70,6 +70,7 @@
     if (/anonymous sign-ins are disabled/i.test(m)) return "Setup needed: turn on anonymous sign-ins in Supabase (Authentication → Sign In / Providers).";
     if (/schema must be one of|Invalid schema/i.test(m)) return "Setup needed: add \"haikudle\" to Exposed schemas in Supabase (Project Settings → Data API).";
     if (/Could not find the function|does not exist/i.test(m)) return "Setup needed: run supabase/schema.sql in the Supabase SQL Editor.";
+    if (/sign_haiku/i.test(m) && /Could not find|does not exist/i.test(m)) return "Signing isn't set up yet. Try again later.";
     if (/captcha/i.test(m)) return "The human check didn't go through. Refresh the page to try again.";
     if (/Failed to fetch|NetworkError|Load failed/i.test(m)) return "Couldn't reach the haiku server. Check your connection and refresh.";
     return m;
@@ -157,6 +158,11 @@
     return b;
   }
 
+  // "— name" under a poem, if it was signed.
+  function signature(name) {
+    return name ? el("div", "sig", `— ${name}`) : null;
+  }
+
   // A finished poem from its tiles (today's) or from plain text (other days).
   function poemFromLines(lineIds, body, small) {
     const box = el("div", "poem" + (small ? " small" : ""));
@@ -194,7 +200,10 @@
       list.replaceChildren();
       rows.forEach((r) => {
         const li = el("li");
-        li.append(el("span", "medal", MEDALS[r.rank - 1] || r.rank), poem(null, r.body, true),
+        const p = poem(null, r.body, true);
+        const sig = signature(r.signature);
+        if (sig) p.append(sig);
+        li.append(el("span", "medal", MEDALS[r.rank - 1] || r.rank), p,
                   el("span", "likes", `♥ ${r.like_count}`));
         list.append(li);
       });
@@ -360,14 +369,49 @@
     if (T.mine) meta.push(`♥ ${T.mine.like_count} like${T.mine.like_count === 1 ? "" : "s"} so far`);
     if (T.same_as_mine > 0) meta.push(`${T.same_as_mine} other ${T.same_as_mine === 1 ? "person" : "people"} wrote the exact same haiku`);
     $("mineMeta").textContent = meta.join(" · ");
+    const name = T.mine && T.mine.signature;
+    $("signName").value = name || Daily.load("dg:haikudle:name", "");
+    signSaved = name || "";
+    drawSignBtn();
     renderSorts();
     loadFeed(true);
   }
 
+  // ---------- optional signature ----------
+  let signSaved = "";
+  const cleanName = (s) => s.replace(/\s+/g, " ").trim();
+  function drawSignBtn() {
+    const v = cleanName($("signName").value);
+    const btn = $("signBtn");
+    btn.disabled = v === signSaved;
+    btn.textContent = v === signSaved && v ? "Saved" : v || !signSaved ? "Save" : "Remove";
+  }
+  $("signName").addEventListener("input", drawSignBtn);
+  $("signForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const btn = $("signBtn");
+    const v = cleanName($("signName").value);
+    btn.disabled = true;
+    try {
+      const saved = await rpc("sign_haiku", { p_name: v });
+      signSaved = saved || "";
+      $("signName").value = signSaved;
+      if (T.mine) T.mine.signature = saved;
+      if (signSaved) Daily.save("dg:haikudle:name", signSaved);   // pre-fill it tomorrow
+      toast(signSaved ? `Signed — ${signSaved}` : "Name removed");
+      loadFeed(true);
+    } catch (err) {
+      toast(friendly(err), 3500);
+    } finally {
+      drawSignBtn();
+    }
+  });
+
   $("shareBtn").addEventListener("click", async () => {
     if (!T || !T.mine) return;
     const url = (window.SITE && SITE.url ? SITE.url + "haikudle/" : location.href.split("?")[0]);
-    const r = await Daily.share(`Haikudle #${T.day}\n\n${T.mine.body}\n\n${url}`);
+    const sig = T.mine.signature ? `\n— ${T.mine.signature}` : "";
+    const r = await Daily.share(`Haikudle #${T.day}\n\n${T.mine.body}${sig}\n\n${url}`);
     if (r === "copied") toast("Copied to clipboard");
     else if (r === "failed") toast("Couldn't copy. Select the text instead.");
   });
@@ -421,6 +465,8 @@
   function entry(r) {
     const card = el("article", "entry board" + (r.is_mine ? " own" : ""));
     card.append(poem(r.lines, r.body, true));
+    const sig = signature(r.signature);
+    if (sig) card.append(sig);
     const foot = el("div", "entry-foot");
     foot.append(el("span", "when", timeAgo(r.created_at)));
     const right = el("div", "right");

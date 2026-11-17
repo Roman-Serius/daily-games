@@ -141,6 +141,24 @@
 .mine-label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.14em; color: var(--gold); }
 .mine-meta { color: var(--muted); font-size: 0.88rem; }
 .mine .actions { margin-top: 0; }
+
+/* ---------- Optional signature ---------- */
+.sign { display: grid; gap: 6px; }
+.sign label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.14em; color: var(--gold); }
+.sign label span { color: var(--muted); text-transform: none; letter-spacing: 0; }
+.sign-row { display: flex; align-items: center; gap: 8px; }
+.sign .dash { color: var(--muted); font-family: var(--serif); font-size: 1.1rem; }
+.sign input {
+  flex: 1; min-width: 0;
+  background: var(--panel-2); color: var(--ink);
+  border: 1px solid rgba(169, 178, 204, 0.25); border-radius: 8px;
+  padding: 8px 10px; font: italic 1rem var(--serif);
+}
+.sign input::placeholder { color: var(--muted); opacity: 0.7; }
+.sign input:focus { outline: none; border-color: var(--gold); }
+.sign .btn { flex: none; }
+.sig { margin-top: 6px; color: var(--muted); font: italic 0.9rem var(--serif); text-align: right; overflow-wrap: anywhere; }
+.best .sig { text-align: left; font-size: 0.82rem; }
 .next { color: var(--muted); font-size: 0.85rem; text-align: center; }
 .next b { font-family: var(--mono); color: var(--ink); }
 

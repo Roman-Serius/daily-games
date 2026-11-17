@@ -71,7 +71,7 @@ or remove the word from `words.csv` and rebuild.
 `tools/publish.sh` rebuilds and uploads in one go, no copy-paste:
 
 ```sh
-cd ~/Developer/daily-games/haikudle/tools
+cd ~/Developer/Website/daily-games/haikudle/tools
 ./publish.sh             # after editing words.csv or schedule.csv
 ./publish.sh --schema    # after changing supabase/schema.sql too
 ./publish.sh --to 730    # next October: build another year of draws

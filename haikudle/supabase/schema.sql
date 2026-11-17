@@ -17,6 +17,7 @@
 --   * Likes: like as many as you want, never your own, toggle on/off.
 --     Liking closes the moment the day changes over.
 --   * At changeover, the top 3 by likes are saved (ties: earliest submitted wins).
+--   * After posting you can sign your haiku with an optional name (no links).
 --
 -- Everything lives in its own schema, "haikudle", so other games can share
 -- the same Supabase project. See README.md for the one setting that needs.
@@ -73,6 +74,10 @@ create table if not exists haikudle.haiku (
   created_at    timestamptz not null default now(),
   unique (day, author)             -- one haiku per player per day
 );
+-- Optional name the player signs today's haiku with (added Nov 2026).
+alter table haikudle.haiku add column if not exists signature text
+  check (signature is null or char_length(signature) between 1 and 24);
+
 create index if not exists haiku_day_likes  on haikudle.haiku (day, like_count desc, created_at, id);
 create index if not exists haiku_day_time   on haikudle.haiku (day, created_at, id);
 create index if not exists haiku_fingerprint on haikudle.haiku (day, fingerprint);
@@ -145,7 +150,8 @@ returns jsonb language sql stable security definer set search_path = haikudle, p
                     from haikudle.words w where w.is_filler and w.active),
     'submitted',  haikudle.has_submitted(haikudle.current_day()),
     'mine',       (select jsonb_build_object('id', h.id, 'body', h.body, 'lines', h.lines,
-                                             'like_count', h.like_count, 'created_at', h.created_at)
+                                             'like_count', h.like_count, 'created_at', h.created_at,
+                                             'signature', h.signature)
                     from haikudle.haiku h
                     where h.day = haikudle.current_day() and h.author = auth.uid()),
     -- how many other players wrote the exact same haiku as you
@@ -261,14 +267,16 @@ $$;
 --   Returns nothing until you've posted your own haiku.
 --   Ties are always broken by earliest submitted.
 -- ---------------------------------------------------------------------
+drop function if exists haikudle.get_feed(text, int, int);   -- its columns changed
 create or replace function haikudle.get_feed(
   p_sort text default 'newest', p_limit int default 50, p_offset int default 0)
 returns table (id bigint, body text, lines jsonb, like_count int,
-               created_at timestamptz, liked_by_me boolean, is_mine boolean)
+               created_at timestamptz, liked_by_me boolean, is_mine boolean, signature text)
 language sql stable security definer set search_path = haikudle, public as $$
   select h.id, h.body, h.lines, h.like_count, h.created_at,
          exists (select 1 from haikudle.likes l where l.haiku_id = h.id and l.user_id = auth.uid()),
-         h.author = auth.uid()
+         h.author = auth.uid(),
+         h.signature
   from haikudle.haiku h
   where h.day = haikudle.current_day()
     and not h.hidden
@@ -327,6 +335,39 @@ end;
 $$;
 
 -- ---------------------------------------------------------------------
+-- sign_haiku(name): put an optional name on today's haiku, or clear it
+-- (empty name). You can change it until the day changes over.
+-- 1-24 characters, and no links, so nobody can use it to advertise.
+-- ---------------------------------------------------------------------
+create or replace function haikudle.sign_haiku(p_name text)
+returns text language plpgsql security definer set search_path = haikudle, public as $$
+declare
+  v_name text := nullif(regexp_replace(btrim(coalesce(p_name, '')), '\s+', ' ', 'g'), '');
+begin
+  if auth.uid() is null then
+    raise exception 'Not signed in' using errcode = '28000';
+  end if;
+  if v_name is not null then
+    if char_length(v_name) > 24 then
+      raise exception 'Keep your name to 24 characters';
+    end if;
+    if v_name ~* '(https?:|www\.|\.(com|net|org|io|gg|co|me|ly|xyz|app|dev)\y|@|/)' then
+      raise exception 'Names can''t include links or handles';
+    end if;
+    if v_name ~ '[[:cntrl:]]' then
+      raise exception 'That name has characters that can''t be used';
+    end if;
+  end if;
+  update haikudle.haiku set signature = v_name
+  where day = haikudle.current_day() and author = auth.uid();
+  if not found then
+    raise exception 'Post today''s haiku first';
+  end if;
+  return v_name;
+end;
+$$;
+
+-- ---------------------------------------------------------------------
 -- report_haiku(haiku_id, reason): flag one for you to look at.
 -- Nothing is hidden automatically; check reports and set hidden = true by hand.
 -- ---------------------------------------------------------------------
@@ -372,8 +413,9 @@ $$;
 -- day_top(day): the saved top 3 for a finished day (default: yesterday).
 -- If the scheduled job hasn't run yet, this saves the results first.
 -- ---------------------------------------------------------------------
+drop function if exists haikudle.day_top(int);   -- its columns changed
 create or replace function haikudle.day_top(p_day int default null)
-returns table (day int, rank smallint, haiku_id bigint, body text, like_count int)
+returns table (day int, rank smallint, haiku_id bigint, body text, like_count int, signature text)
 language plpgsql security definer set search_path = haikudle, public as $$
 #variable_conflict use_column
 declare
@@ -386,7 +428,7 @@ begin
     perform haikudle.finalize_day(v_day);
   end if;
   return query
-    select t.day, t.rank, t.haiku_id, h.body, t.like_count
+    select t.day, t.rank, t.haiku_id, h.body, t.like_count, h.signature
     from haikudle.daily_top t
     join haikudle.haiku h on h.id = t.haiku_id
     where t.day = v_day
@@ -458,6 +500,7 @@ grant execute on function haikudle.get_feed(text, int, int)         to authentic
 grant execute on function haikudle.submit_haiku(jsonb)              to authenticated;
 grant execute on function haikudle.toggle_like(bigint)              to authenticated;
 grant execute on function haikudle.report_haiku(bigint, text)       to authenticated;
+grant execute on function haikudle.sign_haiku(text)                 to authenticated;
 -- finalize_day is not granted: only the scheduled job (and day_top) run it.
 
 -- ---------------------------------------------------------------------

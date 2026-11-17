@@ -19,7 +19,7 @@
   <meta name="theme-color" content="#0d1730">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%230d1730%22/><text x=%2250%22 y=%2270%22 font-size=%2260%22 text-anchor=%22middle%22 fill=%22%23e3b448%22 font-family=%22Georgia%22>D</text></svg>">
   <link rel="stylesheet" href="../shared/style.css">
-  <link rel="stylesheet" href="haikudle.css?v=5">
+  <link rel="stylesheet" href="haikudle.css?v=6">
 </head>
 <body>
   <header class="topbar has-tools">
@@ -69,6 +69,14 @@
       <div class="mine-label">Your haiku</div>
       <div class="poem" id="minePoem"></div>
       <div class="mine-meta" id="mineMeta"></div>
+      <form class="sign" id="signForm" autocomplete="off">
+        <label for="signName">Sign it <span>· optional</span></label>
+        <div class="sign-row">
+          <span class="dash" aria-hidden="true">—</span>
+          <input id="signName" maxlength="24" placeholder="your name or a pen name" autocomplete="nickname" spellcheck="false">
+          <button class="btn secondary" id="signBtn" type="submit">Save</button>
+        </div>
+      </form>
       <div class="actions">
         <button class="btn" id="shareBtn">Share</button>
       </div>
@@ -101,7 +109,7 @@
       <p>Tap a magnet to add it to the highlighted line, and tap a line to switch to it.
         Tap a word in your haiku to take it back off.</p>
       <p>You get <b>one haiku a day</b>. Once it's posted you can read everyone
-        else's and <b>like</b> as many as you want.</p>
+        else's and <b>like</b> as many as you want. You can also sign yours with a name if you'd like.</p>
       <p>The day changes at <b>12:00 UTC</b> (4am Pacific, 7am Eastern in winter).
         Liking closes then, and the top 3 are shown the next day. Ties go to whoever posted first.</p>
       <p class="muted">Keyboard: <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> pick a line,
@@ -136,6 +144,6 @@
   <script src="../shared/games.js"></script>
   <script src="../shared/analytics.js"></script>
   <script src="config.js?v=5"></script>
-  <script src="haikudle.js?v=5"></script>
+  <script src="haikudle.js?v=6"></script>
 </body>
 </html>
