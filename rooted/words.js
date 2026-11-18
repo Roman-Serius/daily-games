@@ -247,7 +247,7 @@ nat.ive nat.ure nat.ion pre.nat.al in=inI.nat._e nat.al
 nomin=nom.ate nomin=nom.al de.nomin=nom.ation=ion re.nown=nom noun=nom pro.noun=nom ig=inN.nomin=nom.y
 syn.onym ant=anti.onym homo.nym=onym pseud=pseudo.onym an.onym.ous acr.onym ep=epi.onym patr.onym.ic
 name _nick.name sur=super.name
-astr._o.nom=nomos.y auto.nom=nomos.y   tax._o.nom=nomos.y
+astr._o.nom=nomos.y   tax._o.nom=nomos.y
 a=an.the.ism a=an.morph.ous a=an.path.y a=an.sym=syn.metr.y an.arch.y a=an.tom 
 
 dent.ist dent.al dent.ure in=inI.dent dand=dent._elion tri.dent
@@ -1192,7 +1192,7 @@ Object.assign(window.ROOTED_PARTS, {
 
 // ---- fourth batch (Nov 15, 2026): words from the first playtest's misses ----
 Object.assign(window.ROOTED_PARTS, {
-  art:    ["r", "art", "skill, craft", "Latin ars, artis"],
+  art:    ["r", "art", "skill, craft", "Latin ars, artis", "artus"],
   schol:  ["r", "schol / school", "leisure, lecture", "Greek skholē"],
   parare: ["r", "par / pair / per", "make ready", "Latin parare"],
 });
@@ -1237,4 +1237,22 @@ archae=arch._o.log.y arche=arch._o.log.y archae=arch._o.log.ic.al arche=arch._o.
 arch._enemy tempt tempt.ation=ion at=ad.tempt fict=fig._iti.ous magn._i.fic=fac.ation=ion
 bi.col=con.later.al bi.later.al.ity col=con.later.al col=con.later.al.ity col=con.later.al.ize later.al.ity
 matr._i.later.al tri.later.al uni.later.al.ism uni.later.al.ist equ._i.later.al multi.later.al
+`;
+
+// ---- sixth batch (Nov 18, 2026): first live-sheet sweep ----
+Object.assign(window.ROOTED_PARTS, {
+  artus:  ["r", "artic", "joint", "Latin artus, articulus", "art"],
+  noc:    ["r", "noc / nox", "harm", "Latin nocere, noxa"],
+  macr:   ["r", "macr", "large, long", "Greek makros"],
+  icon:   ["r", "icon", "image", "Greek eikōn"],
+  clast:  ["r", "clast", "break", "Greek klan"],
+});
+window.ROOTED_WORDS += `
+auto.nom=nomos.ous spec._i.fic=fac epi.scop.al epi.scop._ate
+artic=artus._le artic=artus._ul.ate artic=artus._ul.ation=ion in=inN.artic=artus._ul.ate
+gram=graph._o.phon._e spectr=spec._o.scop._e spectr=spec._um spectr=spec.al
+e=ex.dit=dare e=ex.dit=dare.ion e=ex.dit=dare.ion.al micro.fict=fig.ion
+gram=graph._mat.ic.al scop._o.phob.ia micro.bi=bio._al micro._lens micro._bead micro macr._o macr._o.scop.ic
+of=ob.fic=fac._e of=ob.fic=fac._i.al nox=noc._i.ous ob.nox=noc._i.ous in=inN.noc._ent in=inN.noc._uous in=inN.noc.ence
+icon icon.ic icon._o.graph.y icon._o.clast icon._o.clast.ic
 `;
