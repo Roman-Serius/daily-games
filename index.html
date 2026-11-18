@@ -32,23 +32,31 @@
   </script>
 
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%230d1730%22/><text x=%2250%22 y=%2270%22 font-size=%2260%22 text-anchor=%22middle%22 fill=%22%23e3b448%22 font-family=%22Georgia%22>D</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,800&family=Newsreader:ital,opsz,wght@0,6..72,400;1,6..72,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://romanserius.com/assets/dateline.css">
   <link rel="stylesheet" href="shared/style.css">
   <style>
-    .hub { max-width: 720px; margin: 0 auto; padding: 28px 16px 48px; }
-    .hero h1 { font-family: var(--serif); font-size: 2.4rem; margin: 0; color: var(--gold); }
+    /* Hub: a blue-pages masthead like /games/ */
+    .hub { max-width: 720px; margin: 0 auto; padding: 0 16px 48px; }
+    .hero { text-align: center; padding: 22px 0 18px; border-bottom: 3px double var(--ink); }
+    .hero .kicker { font-style: normal; font-family: "IBM Plex Mono", var(--mono); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--gold); margin: 0 0 8px; }
+    .hero .kicker b { color: var(--red); font-weight: 500; }
+    .hero h1 { font-family: "Fraunces", var(--serif); font-weight: 800; font-size: clamp(44px, 10vw, 80px); line-height: .95; letter-spacing: -.02em; margin: 0; color: var(--ink); }
     .hero h1 span { color: var(--red); }
-    .hero p { color: var(--muted); margin: 6px 0 0; }
-    .date { font-family: var(--mono); color: var(--ink); font-size: 0.9rem; margin-top: 14px; }
+    .hero p { font-family: "Fraunces", var(--serif); font-style: italic; font-size: 20px; color: var(--muted); margin: 12px 0 0; }
+    .date { font-family: "IBM Plex Mono", var(--mono); color: var(--ink); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; margin-top: 14px; }
     .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px; margin-top: 24px; }
     .game-card {
       display: flex; flex-direction: column; gap: 8px;
-      background: var(--panel); border: 1px solid var(--panel-2); border-radius: 14px;
+      background: var(--panel); border: 1px solid #34477a; border-radius: 0;
       padding: 16px; text-decoration: none; color: var(--ink); min-height: 170px;
       transition: transform .12s, border-color .12s;
     }
-    a.game-card:hover { transform: translateY(-2px); border-color: var(--gold); }
+    a.game-card:hover { transform: translate(-2px, -2px); box-shadow: 4px 4px 0 var(--gold); border-color: var(--gold); }
     .game-card .glyph { font-family: var(--mono); font-size: 1.1rem; letter-spacing: .25em; color: var(--gold); }
-    .game-card h2 { font-family: var(--serif); margin: 0; font-size: 1.3rem; }
+    .game-card h2 { font-family: "Fraunces", var(--serif); font-weight: 600; margin: 0; font-size: 1.4rem; }
     .game-card p { margin: 0; color: var(--muted); font-size: .9rem; flex: 1; }
     .game-card .status { font-size: .78rem; font-family: var(--mono); }
     .game-card .status.done { color: var(--hit); }
@@ -58,17 +66,23 @@
   </style>
 </head>
 <body>
-  <header class="topbar">
-    <a class="brand" href="/">Roman <span>·</span> Serius</a>
-    <nav class="site-nav" aria-label="Site">
-      <a href="/games/">Games</a>
-      <a href="/daily-games/" aria-current="page">Daily</a>
-      <a href="https://intothevoidpress.substack.com">Writing</a>
-      <a href="/about/">About</a>
-    </nav>
+  <header class="dateline-bar blue">
+    <div class="dateline">
+      <a class="dl-home" href="/">← Front page</a>
+      <nav class="site-nav" aria-label="Site">
+        <a href="/games/">Games</a>
+        <a href="/art-and-comics/">Art &amp; Comics</a>
+        <a href="/daily-games/" aria-current="page">Daily</a>
+        <a href="https://intothevoidpress.substack.com">Writing</a>
+        <a href="/about/">About</a>
+        <a href="/now/">Now</a>
+        <a href="/guestbook/">Guestbook</a>
+      </nav>
+    </div>
   </header>
   <main class="hub">
     <section class="hero">
+      <p class="kicker">Roman Serius <b>·</b> The blue pages</p>
       <h1>Daily Games</h1>
       <p>Small puzzles. One a day, same for everyone.</p>
       <div class="date" id="today"></div>

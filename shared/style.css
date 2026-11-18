@@ -30,36 +30,8 @@ html, body {
 
 a { color: var(--gold); }
 
-.topbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 10px 16px;
-  border-bottom: 1px solid var(--panel-2);
-}
-.topbar .brand {
-  font-family: var(--serif);
-  font-size: 1.15rem;
-  letter-spacing: 0.04em;
-  color: var(--gold);
-  text-decoration: none;
-}
-.topbar .brand span { color: var(--red); }
-.topbar nav { display: flex; gap: 6px; }
-
-/* Site links: the same bar as romanserius.com/games/ (homepage repo: assets/roman-serius.css) */
-.topbar .site-nav { gap: 16px; margin-right: auto; margin-left: 6px; }
-.site-nav a { color: var(--muted); text-decoration: none; font-size: 0.92rem; }
-.site-nav a:hover, .site-nav a[aria-current="page"] { color: var(--ink); }
-.site-nav a[aria-current="page"] { border-bottom: 2px solid var(--red); padding-bottom: 2px; }
-.topbar .brand { white-space: nowrap; }
-@media (max-width: 560px) { .topbar.has-tools .site-nav { display: none; } }
-@media (max-width: 420px) {
-  .topbar { gap: 8px; padding: 10px 12px; }
-  .topbar .site-nav { gap: 11px; margin-left: 2px; }
-  .site-nav a { font-size: 0.84rem; }
-}
+/* The site header (dateline) is shared with the rest of romanserius.com:
+   https://romanserius.com/assets/dateline.css (homepage repo). */
 
 .icon-btn {
   background: none;
