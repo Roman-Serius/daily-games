@@ -193,8 +193,12 @@
   const SHEET = new Image();
   let sheetOK = false;
   SHEET.onload = () => { sheetOK = true; drawRoots(); };
-  SHEET.src = "Art/Aseprite/PNG/Roots-Sheet.png";
-  const FR = { trunk: [0, 2], bend: [1, 3], tip: 6, rootlet: 7, leaf: 8, wilted: 9, gold: 10 };
+  SHEET.src = "Art/Aseprite/Roots-Sheet.png";
+  // Art/Aseprite/Roots-Sheet.png: 16x16 frames stacked vertically, three colorways of 12:
+  //   0-11 growing (red), 12-23 dead (grey, for a give-up), 24-35 gold (the winning path).
+  //   In each: 0,2,3 trunk · 1,4 bend · 5,6 narrowing trunk · 7 narrowing bend · 8 tip ·
+  //   9 tip bend (rootlet) · 10 leaf (wilted in the grey set) · 11 empty.
+  const FR = { trunk: [0, 2, 3], bend: [1, 4], narrow: [5, 6], narrowBend: 7, tip: 8, rootlet: 9, leaf: 10, dead: 12, gold: 24 };
   const GROW_MS = 1700, MEET_MS = 2400;   // how long a new root takes to reach its word / the other side
 
   function drawRoots(t) {
@@ -209,6 +213,7 @@
   // Seeded by the puzzle, so it stays put while you play.
   const BG = { base: [102, 57, 49], streak: [172, 50, 50], edge: [69, 38, 33] };
   const MEET_PAL = { base: [143, 86, 59], streak: [217, 160, 102], edge: [102, 57, 49] };
+  const DEAD_PAL = { base: [102, 57, 49], streak: [132, 126, 135], edge: [69, 38, 33] };
   const bgCache = { key: "", cv: null };
   function hash2(a, b) {
     let h = Math.imul(a, 374761393) + Math.imul(b, 668265263);
@@ -225,7 +230,7 @@
     const W = BD.W, H = BD.H, px = BD.img.data, prio = BD.prio;
     const r = w / 2, R = Math.ceil(r);
     const a = Math.round(255 * Math.min(1, 0.35 + w / 14));
-    const p = Math.min(255, Math.round(w * 16)) + (pal === MEET_PAL ? 1 : 0);
+    const p = Math.min(255, Math.round(w * 16)) + (pal === BG ? 0 : 1);
     for (let oy = -R; oy <= R; oy++) for (let ox = -R; ox <= R; ox++) {
       if (ox * ox + oy * oy > r * r + 0.3) continue;
       const x = Math.round(cx + ox), y = Math.round(cy + oy);
@@ -383,8 +388,9 @@
       }
       grp.target = grp.max;
     });
-    if (state.status === "won" && !BD.gold) {
-      BD.gold = true;                       // every background root turns light gold, top down
+    if (state.status !== "playing" && !BD.gold) {
+      // every background root changes color, top down: light gold on a win, grey on a give-up
+      BD.gold = state.status === "won" ? MEET_PAL : DEAD_PAL;
       for (const g of BD.groups.slice(0, 2)) { g.goldR = 0; g.goldIdx = 0; }
     }
     if (state.status === "won" && meet && !BD.joined) {
@@ -427,7 +433,7 @@
       while (g.idx < g.stamps.length && g.stamps[g.idx].dist <= g.R) {
         const st = g.stamps[g.idx];
         if (!g.shown[g.idx] && st.y <= g.cap) {
-          bdStampPixels(goldNow && st.dist <= (g.goldR ?? 0) ? { ...st, pal: MEET_PAL } : st);
+          bdStampPixels(goldNow && st.dist <= (g.goldR ?? 0) ? { ...st, pal: BD.gold } : st);
           g.shown[g.idx] = 1; changed = true;
         }
         g.idx++;
@@ -435,7 +441,7 @@
       // the gold wave: recolor roots already grown, in growth order
       if (goldNow) {
         while (g.goldIdx < g.stamps.length && g.stamps[g.goldIdx].dist <= g.goldR) {
-          if (g.shown[g.goldIdx]) { bdStampPixels({ ...g.stamps[g.goldIdx], pal: MEET_PAL }); changed = true; }
+          if (g.shown[g.goldIdx]) { bdStampPixels({ ...g.stamps[g.goldIdx], pal: BD.gold }); changed = true; }
           g.goldIdx++;
         }
       }
@@ -542,8 +548,9 @@
       const Y0 = Math.round(pw.b - 3);
       const yB = Math.round((sq.t + sq.b) / 2 - 13);
       const gold = done && onPath.has(n.word) && onPath.has(n.parent);
-      const base = gold ? FR.gold : 0;
-      const alpha = done && !gold ? 0.45 : 1;
+      // finished: the winning path turns gold, every other root dies back to grey
+      const base = gold ? FR.gold : done ? FR.dead : 0;
+      const alpha = state.status === "won" && !gold ? 0.8 : 1;
       const prog = n.move === newest ? t : 1;
       const reach = Y0 + (yB + 16 - Y0) * prog;          // how far down this root has grown
       const kids = nodes.get(n.parent).kids;
@@ -555,11 +562,14 @@
         // while growing, the trunk stops short and the tip piece leads the way down
         g.rect(X - 2, Y0, 20, Math.max(0, Math.min(yB + (last ? 0 : 2), reach - (growing ? 12 : 0)) - Y0));
         g.clip();
-        for (let k = 0, y = Y0; y < yB + 2; k++, y += 16) spr(base + pick(n.parent + "#" + k, FR.trunk), X, y, !left, alpha);
+        for (let k = 0, y = Y0; y < yB + 2; k++, y += 16) {
+          const lastPiece = y + 16 >= yB + 2;           // where the trunk ends, its last piece tapers
+          spr(base + pick(n.parent + "#" + k, lastPiece && last ? FR.narrow : FR.trunk), X, y, !left, alpha);
+        }
         g.restore();
       }
       if (growing && reach < yB + 12) spr(base + FR.tip, X, Math.max(Y0 - 4, reach - 16), !left, alpha);
-      if (reach >= yB + 12) bends.push([base + pick(n.word, FR.bend), last ? X : X + (left ? 8 : -8), yB, !left, alpha]);
+      if (reach >= yB + 12) bends.push([base + (last ? FR.narrowBend : pick(n.word, FR.bend)), last ? X : X + (left ? 8 : -8), yB, !left, alpha]);
       const prev = runs.get(n.parent);
       if (!prev || yB - Y0 > prev.len) runs.set(n.parent, { len: yB - Y0, X, Y0, left, base, alpha, grown: reach >= yB });
     }
@@ -571,7 +581,7 @@
       spr(r.base + FR.rootlet, r.left ? r.X - 12 : r.X + 12, r.Y0 + 16 * k + 2, r.left, r.alpha);
     }
     // a leaf on each starting word: green while growing, gold on a win, wilted on a give-up
-    const leaf = state.status === "won" ? FR.gold + FR.leaf : state.status === "lost" ? FR.wilted : FR.leaf;
+    const leaf = state.status === "won" ? FR.gold + FR.leaf : state.status === "lost" ? FR.dead + FR.leaf : FR.leaf;
     for (const [w, left] of [[START, true], [TARGET, false]]) {
       const e = el(w);
       if (!e) continue;
