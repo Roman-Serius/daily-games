@@ -105,14 +105,37 @@ def stems(w, lang):
             out.add(w[: -len(e)])
     return out
 
-def load_hunspell():
+def load_hunspell(expand=False):
+    """Every word Hunspell lists. With expand=True, also its affixed forms (cure/B -> curable)."""
+    aff = HUNSPELL.with_suffix(".aff")
+    rules = defaultdict(list)            # flag -> [(kind, strip, add, condition regex)]
+    if aff.exists():
+        for line in aff.read_text(encoding="utf-8", errors="ignore").splitlines():
+            f = line.split()
+            if len(f) >= 5 and f[0] in ("SFX", "PFX"):
+                kind, flag, strip, add, cond = f[0], f[1], f[2], f[3].split("/")[0], f[4]
+                strip = "" if strip == "0" else strip
+                add = "" if add == "0" else add
+                pat = re.compile((cond + "$") if kind == "SFX" else ("^" + cond))
+                rules[flag].append((kind, strip, add, pat))
     words = set()
     with open(HUNSPELL, encoding="utf-8", errors="ignore") as f:
         next(f)
         for line in f:
-            w = line.split("/")[0].strip()
-            if re.fullmatch(r"[a-z]+", w):
-                words.add(w)
+            w, _, flags = line.strip().partition("/")
+            if not re.fullmatch(r"[a-z]+", w):
+                continue
+            words.add(w)
+            for flag in (flags if expand else ""):
+                for kind, strip, add, pat in rules.get(flag, ()):
+                    if kind == "SFX" and w.endswith(strip) and pat.search(w):
+                        x = w[: len(w) - len(strip)] + add
+                    elif kind == "PFX" and w.startswith(strip) and pat.search(w):
+                        x = add + w[len(strip):]
+                    else:
+                        continue
+                    if re.fullmatch(r"[a-z]+", x):
+                        words.add(x)
     return words
 
 def clean_arg(v):
@@ -519,6 +542,17 @@ DERIVE_SUFFIX = {"ion": "ion", "ation": "ion", "ist": "ist", "ism": "ism", "ize"
                  "ive": "ive", "ous": "ous", "ment": "ment", "able": "able", "ible": "able", "ence": "ence",
                  "ance": "ence", "ent": "ent", "ant": "ent", "ure": "ure", "ory": "ory", "ic": "ic", "al": "al",
                  "ical": None, "ian": "ian", "ate": "ate", "er": "er", "or": "er"}
+# Ending swaps: (last piece id, its text) -> possible replacement endings.
+SWAPS = {
+    ("y", "y"):       [[("ist", "ist")], [("ic", "ic")], [("ic", "ic"), ("al", "al")], [("ism", "ism")]],
+    ("ent", "ent"):   [[("ence", "ence")], [("ency", "ence")]],
+    ("ent", "ant"):   [[("ance", "ence")], [("ancy", "ence")]],
+    ("ence", "ence"): [[("ent", "ent")]],
+    ("ence", "ance"): [[("ant", "ent")]],
+    ("ist", "ist"):   [[("ism", "ism")]],
+    ("ism", "ism"):   [[("ist", "ist")]],
+    ("ic", "ic"):     [[("ism", "ism")], [("ist", "ist")]],
+}
 DERIVE_PREFIX = ["re", "un", "dis", "pre", "de", "inter", "super", "sub", "trans", "anti", "co", "semi",
                  "hyper", "hypo", "counter", "multi", "over", "mis", "non", "pro", "post", "ex"]
 
@@ -534,7 +568,8 @@ def mentions(e_list, *pieces):
 
 def derive(d, added, skip, entries):
     """projector = project + -or, rediscover = re- + discover. Kept only if Hunspell knows the result."""
-    hun = load_hunspell()
+    stems_only = load_hunspell()
+    hun = load_hunspell(expand=True)   # -er/-or use stems_only: expanded forms add comparatives (crass -> crasser)
     prefix_id = {p: (d.affix_id(p, "p") if p not in ("over", "mis", "non", "counter", "multi") else None) for p in DERIVE_PREFIX}
     if "multi" in d.parts:
         prefix_id["multi"] = "multi"
@@ -561,7 +596,7 @@ def derive(d, added, skip, entries):
                     forms = [(base[:-1] + "ic", "fication")]
                 for stem, how in forms:
                     w = stem + suf
-                    if w in d.words or w in new or w in skip or w not in hun:
+                    if w in d.words or w in new or w in skip or w not in (stems_only if suf in ("er", "or") else hun):
                         continue
                     last_text, last_id = segs[-1]
                     if how == "drop":
@@ -580,6 +615,21 @@ def derive(d, added, skip, entries):
                         continue      # wisent is not wise + -ent
                     if "".join(t for t, _ in out) == w and all(t for t, _ in out):
                         new[w] = (out, f"derive:{base}+-{suf}")
+            # ending swaps: neurology -> neurologist, telepathy -> telepathic, benevolent -> benevolence
+            last_text, last_id = segs[-1]
+            for (from_id, from_text), outs in SWAPS.items():
+                if last_id != from_id or last_text != from_text or len(base) < 6:
+                    continue
+                for tail in outs:
+                    w = base[: len(base) - len(from_text)] + "".join(t for t, _ in tail)
+                    if w in d.words or w in new or w in skip or w not in hun:
+                        continue
+                    if w in entries and not mentions(entries[w], base, *(t for t, _ in tail), *("-" + t for t, _ in tail),
+                                                     base[: len(base) - len(from_text)]):
+                        # Wiktionary often says neuro- + -logist rather than neurology + -ist: accept that too
+                        if not any(mentions(entries[w], pre_t) for pre_t, pid in segs[:-1] if pid):
+                            continue
+                    new[w] = (list(segs[:-1]) + list(tail), f"swap:{base}:{from_text}->{''.join(t for t, _ in tail)}")
             # prefixes
             for pre in DERIVE_PREFIX:
                 w = pre + base
