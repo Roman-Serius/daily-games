@@ -1256,3 +1256,18 @@ gram=graph._mat.ic.al scop._o.phob.ia micro.bi=bio._al micro._lens micro._bead m
 of=ob.fic=fac._e of=ob.fic=fac._i.al nox=noc._i.ous ob.nox=noc._i.ous in=inN.noc._ent in=inN.noc._uous in=inN.noc.ence
 icon icon.ic icon._o.graph.y icon._o.clast icon._o.clast.ic
 `;
+
+// ---- seventh batch (Nov 25, 2026): live-sheet sweep ----
+Object.assign(window.ROOTED_PARTS, {
+  potat:  ["r", "pot / pota", "drink", "Latin potare"],
+});
+window.ROOTED_WORDS += `
+equ._i.di=dis.st=sta.ant=ent equ._i.di=dis.st=sta.ance=ence
+de.fic=fac._it de.fic=fac._i.ent de.fic=fac._i.ency=ence ef=ex.fic=fac._i.ent ef=ex.fic=fac._i.ency=ence
+suf=sub.fic=fac._i.ency=ence _or._i.fic=fac._e
+bene.vol.ence uni.fy uni._fi.cation=ion re=re.uni.fy sanct=sacr._imoni.ous
+arthr._o.log.y neur._o.log.ist hydr._o.lys._is kin=cin.esthes=aesthe.ia kin=cin._esi._o.log.y
+mega._l.odon=odont tele.path.ic man._i._pul.ate man._i._pul.ation=ion
+pot=potat.able pot=potat.ion pot=potat._ation cur=cura.able in=inN.cur=cura.able
+pre._medit.ate pre._medit.ation=ion flor._esc.ent fluor=flu._esc.ent fluor=flu._esc.ence=ence
+`;
