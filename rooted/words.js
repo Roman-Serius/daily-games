@@ -663,7 +663,7 @@ anim.al anim.ate anim.ation=ion un=uni.anim.ous in=inN.anim.ate equ.anim.ity ani
 mania mania._c  pyr._o.mania
 pyr._e pyr._o.techn.ic
 fire fire._work _camp.fire _wild.fire fire._place
-mon.arch an.arch.ist  arch._a.ic arch._ive  arch._angel
+mon=mono.arch mon=mono.arch.y an.arch.ist  arch._a.ic arch._ive  arch._angel
 mon._it.or=er mon._u.ment ad.mon._ish sum=sub.mon pre.mon._it.ion de.mon._str.ate mon._ster
 re.mon._str.ate
 polit=polis.ic._s polic=polis._e polic=polis._y metr=matr._o.polis cosm._o.polit=polis.an=ian
